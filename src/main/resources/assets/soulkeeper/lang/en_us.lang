@@ -1,0 +1,8 @@
+itemGroup.soulkeeper_mod=Soulkeeper
+
+tile.block_soulkeeper_plant.name=Soulkeeper
+tile.block_dark_rhinestone.name=Block of dark rhinestone
+tile.dark_crystal_stalactite.name=Crystal stalactite
+
+item.item_tiny_rhinestone_dust.name=Tiny pile of rhinestone dust
+item.item_rhinestone_dust.name=Rhinestone dust

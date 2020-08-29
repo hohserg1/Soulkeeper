@@ -1,0 +1,28 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cross",
+    "textures": {
+      "cross": "soulkeeper:blocks/soulkeeper_ripening"
+    }
+  },
+  "variants": {
+    "grow": {
+      "empty": {
+        "textures": {
+          "cross": "soulkeeper:blocks/soulkeeper_empty"
+        }
+      },
+      "ripening": {
+        "textures": {
+          "cross": "soulkeeper:blocks/soulkeeper_ripening"
+        }
+      },
+      "ripe": {
+        "textures": {
+          "cross": "soulkeeper:blocks/soulkeeper_ripe"
+        }
+      }
+    }
+  }
+}

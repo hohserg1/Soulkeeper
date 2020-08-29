@@ -1,0 +1,16 @@
+[
+{
+  "modid": "soulkeeper",
+  "name": "Soulkeeper",
+  "description": "Experience related content",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Nao","hohserg"],
+  "credits": "Thank you Holda and Oldestkon for translating!",
+  "logoFile": "logo.png",
+  "screenshots": [],
+  "dependencies": ["codechickenlib"]
+}
+]

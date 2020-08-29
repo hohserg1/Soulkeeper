@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "xxx",
+    "xxx",
+    "xxx"
+  ],
+  "key": {
+    "x": {
+      "item": "soulkeeper:item_rhinestone_dust"
+    }
+  },
+  "result": {
+    "item": "soulkeeper:block_dark_rhinestone_powder",
+    "count": 1
+  }
+}

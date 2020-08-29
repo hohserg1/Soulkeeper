@@ -1,0 +1,6 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "soulkeeper:blocks/soulkeeper_ripe"
+  }
+}

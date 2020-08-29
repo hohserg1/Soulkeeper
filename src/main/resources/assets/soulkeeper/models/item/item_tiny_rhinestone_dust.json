@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "soulkeeper:items/item_tiny_rhinestone_dust"
+  }
+}

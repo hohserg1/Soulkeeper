@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "soulkeeper:item_tiny_rhinestone_dust"
+    },
+    {
+      "item": "soulkeeper:item_tiny_rhinestone_dust"
+    },
+    {
+      "item": "soulkeeper:item_tiny_rhinestone_dust"
+    },
+    {
+      "item": "soulkeeper:item_tiny_rhinestone_dust"
+    }
+  ],
+  "result": {
+    "item": "soulkeeper:item_rhinestone_dust",
+    "count": 1
+  }
+}
