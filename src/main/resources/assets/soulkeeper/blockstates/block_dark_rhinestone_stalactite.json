@@ -1,11 +1,4 @@
 {
-  "variants": {
-    "normal": "soulkeeper:block_dark_rhinestone_stalactite",
-    "inventory": "soulkeeper:block_dark_rhinestone_stalactite"
-  }
-}
-
-{
   "forge_marker": 1,
   "defaults": {
     "model": "soulkeeper:block_dark_rhinestone_stalactite"
