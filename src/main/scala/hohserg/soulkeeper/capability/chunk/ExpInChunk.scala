@@ -1,4 +1,4 @@
-package hohserg.soulkeeper.capability
+package hohserg.soulkeeper.capability.chunk
 
 class ExpInChunk {
 

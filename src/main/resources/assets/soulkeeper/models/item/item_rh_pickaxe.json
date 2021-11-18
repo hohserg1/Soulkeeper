@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "soulkeeper:items/item_rh_pickaxe_empty"
+  }
+}

@@ -47,4 +47,9 @@ public class Configuration {
 
     public static int soulkeeperXPDrop = 20;
 
+    @Config.RangeInt(min = 1)
+    public static int rhinestoneDustChestLootRarity = 100;
+    @Config.RangeInt(min = 1)
+    public static int rhinestoneToolsChestLootRarity = 1000;
+
 }

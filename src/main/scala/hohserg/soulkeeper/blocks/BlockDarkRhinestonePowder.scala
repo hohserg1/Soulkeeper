@@ -41,42 +41,44 @@ object BlockDarkRhinestonePowder extends BlockFalling(Material.SAND) {
 
 
   override def onEntityCollidedWithBlock(worldIn: World, pos: BlockPos, state: IBlockState, entityIn: Entity): Unit = {
-    entityIn match {
-      case orb: CustomEntityXPOrb =>
-        if (orb.xpValue > xpPerInfuseState) {
-          val otherAmount = infuse(worldIn, pos, orb.xpValue)
-          if (otherAmount > 0)
-            orb.setXpValue(otherAmount)
-          else
-            orb.setDead()
-        } else {
-          val entities = worldIn.getEntitiesWithinAABB(classOf[CustomEntityXPOrb], new AxisAlignedBB(pos)).asScala
-          val sum = entities.map(e => e.xpValue).sum
-          if (sum > xpPerInfuseState) {
-            val otherAmount = infuse(worldIn, pos, sum)
-            entities.foreach(_.setDead())
+    if (!worldIn.isRemote)
+      entityIn match {
+        case orb: CustomEntityXPOrb if orb.isEntityAlive =>
+          if (orb.xpValue >= xpPerInfuseState) {
+            val otherAmount = infuse(worldIn, pos, orb.xpValue)
             if (otherAmount > 0)
-              worldIn.spawnEntity(new CustomEntityXPOrb(new EntityXPOrb(worldIn, pos.getX, pos.getY, pos.getZ, otherAmount)))
+              orb.setXpValue(otherAmount)
+            else
+              orb.setDead()
+          } else {
+            val entities = worldIn.getEntitiesWithinAABB(classOf[CustomEntityXPOrb], new AxisAlignedBB(pos)).asScala.filter(_.isEntityAlive)
+            val sum = entities.map(e => e.xpValue).sum
+            if (sum > xpPerInfuseState) {
+              val otherAmount = infuse(worldIn, pos, sum)
+              entities.foreach(_.setDead())
+              if (otherAmount > 0)
+                worldIn.spawnEntity(new CustomEntityXPOrb(new EntityXPOrb(worldIn, pos.getX, pos.getY, pos.getZ, otherAmount)))
+            }
           }
-        }
-      case _ =>
-    }
+        case _ =>
+      }
   }
 
   def infuse(world: World, pos: BlockPos, amount: Int): Int = {
     val currentInfuse = world.getBlockState(pos).getValue(infuseProperty)
     val currentInfuseAmount = currentInfuse * xpPerInfuseState
 
-    val otherAmount = currentInfuseAmount + amount - 15 * xpPerInfuseState
     val nextInfuse = (currentInfuseAmount + amount) / xpPerInfuseState
+    val nextInfuseAmount = nextInfuse * xpPerInfuseState
+
     if (currentInfuse < nextInfuse) {
       if (nextInfuse > 15)
         world.setBlockState(pos, BlockDarkRhinestone.getDefaultState)
       else
         world.setBlockState(pos, withInfuse(math.min(15, nextInfuse)))
-      math.max(0, otherAmount)
-    } else
-      amount
+    }
+
+    currentInfuseAmount + amount - nextInfuseAmount
   }
 
 }

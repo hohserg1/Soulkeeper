@@ -7,10 +7,10 @@ import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType}
 
 object BlockDarkRhinestone extends Block(Material.GLASS) {
 
-  setHardness(1)
+  setHardness(5)
   setResistance(10)
   setSoundType(SoundType.GLASS)
-  setHarvestLevel("pickaxe", 0)
+  setHarvestLevel("pickaxe", 1)
 
   override def getRenderType(state: IBlockState): EnumBlockRenderType = super.getRenderType(state)
 

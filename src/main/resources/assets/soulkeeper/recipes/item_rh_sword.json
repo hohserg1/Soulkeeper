@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "r",
+    "r",
+    "|"
+  ],
+  "key": {
+    "r": {
+      "item": "soulkeeper:item_rhinestone_dust"
+    },
+    "|": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "soulkeeper:item_rh_sword",
+    "count": 1
+  }
+}

@@ -1,4 +1,4 @@
-package hohserg.soulkeeper.capability
+package hohserg.soulkeeper.capability.chunk
 
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.capability.Capabilities.expInChunk
@@ -12,9 +12,11 @@ class ExpInChunkProvider extends ICapabilitySerializable[NBTTagCompound] {
 
   val instance = new ExpInChunk
 
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == expInChunk && facing == EnumFacing.UP
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
+    capability == expInChunk && facing == EnumFacing.UP
 
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = expInChunk.cast(if (capability == expInChunk && facing == EnumFacing.UP) instance else null)
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
+    expInChunk.cast(if (hasCapability(capability, facing)) instance else null)
 
   override def serializeNBT(): NBTTagCompound =
     expInChunk.writeNBT(instance, EnumFacing.UP).asInstanceOf[NBTTagCompound]

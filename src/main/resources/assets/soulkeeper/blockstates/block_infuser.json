@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "normal": { "model": "soulkeeper:block_infuser" },
+    "inventory": { "model": "soulkeeper:block_infuser" }
+  }
+}

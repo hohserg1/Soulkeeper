@@ -1,4 +1,4 @@
-package hohserg.soulkeeper.capability
+package hohserg.soulkeeper.capability.chunk
 
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.EnumFacing

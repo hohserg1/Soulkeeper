@@ -3,10 +3,11 @@ package hohserg.soulkeeper.blocks
 import java.util.Random
 
 import hohserg.soulkeeper.Configuration
-import hohserg.soulkeeper.capability.ExpInChunkProvider
+import hohserg.soulkeeper.blocks.BlockDarkRhinestoneStalactite.{lightValue, setSoundType}
+import hohserg.soulkeeper.capability.chunk.ExpInChunkProvider
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.items.ItemTinyRhinestoneDust
-import net.minecraft.block.Block
+import net.minecraft.block.{Block, SoundType}
 import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
@@ -17,9 +18,13 @@ import net.minecraft.init.{Blocks, Enchantments, Items}
 import net.minecraft.item.Item
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
 import net.minecraft.util.{BlockRenderLayer, EnumFacing, EnumHand}
-import net.minecraft.world.{IBlockAccess, World}
+import net.minecraft.world.{IBlockAccess, World, WorldServer}
+import net.minecraftforge.common.util.FakePlayerFactory
 
 object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
+  setSoundType(SoundType.GLASS)
+  lightValue = 2
+
   /** grow property **/
   lazy val growProperty = PropertyEnum.create[GrowStage]("grow", classOf[GrowStage])
 
@@ -60,8 +65,10 @@ object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
   /** drop **/
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (worldIn.getBlockState(pos).getValue(growProperty) == GrowStage.Ripe) {
-      worldIn.setBlockState(pos, getDefaultState.withProperty(growProperty, GrowStage.Empty))
-      worldIn.spawnEntity(new CustomEntityXPOrb(new EntityXPOrb(worldIn, pos.getX + hitX, pos.getY + hitX, pos.getZ + hitZ, Configuration.soulkeeperXPDrop)))
+      if (!worldIn.isRemote) {
+        worldIn.setBlockState(pos, getDefaultState.withProperty(growProperty, GrowStage.Empty))
+        worldIn.spawnEntity(new CustomEntityXPOrb(new EntityXPOrb(worldIn, pos.getX + hitX, pos.getY + hitX, pos.getZ + hitZ, Configuration.soulkeeperXPDrop)))
+      }
       true
     } else
       false
@@ -72,6 +79,12 @@ object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
   override def quantityDropped(state: IBlockState, fortune: Int, random: Random): Int = {
     val stage = state.getValue(growProperty)
     (stage.baseDropCount + random.nextDouble() * stage.additionalDropCount).toInt
+  }
+
+  override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
+    if (!worldIn.isRemote)
+      onBlockActivated(worldIn, pos, state, FakePlayerFactory.getMinecraft(worldIn.asInstanceOf[WorldServer]), EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0)
+    super.breakBlock(worldIn, pos, state)
   }
 
   override def canSilkHarvest(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer): Boolean =

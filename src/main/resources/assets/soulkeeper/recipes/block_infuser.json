@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ROR",
+    "OOO"
+  ],
+  "key": {
+    "R": {
+      "item": "soulkeeper:block_dark_rhinestone"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "result": {
+    "item": "soulkeeper:block_infuser",
+    "count": 1
+  }
+}

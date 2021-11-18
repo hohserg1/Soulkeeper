@@ -1,0 +1,16 @@
+itemGroup.soulkeeper_mod=Soulkeeper
+
+tile.block_soulkeeper_plant.name=Хранитель душ
+tile.block_dark_rhinestone.name=Блок темного хрусталя
+tile.block_dark_rhinestone_powder.name=Блок хрустальной пыли
+tile.block_dark_rhinestone_stalactite.name=Хрустальный сталактит
+tile.block_infuser.name=Наполнитель опытом
+
+item.item_tiny_rhinestone_dust.name=Маленькая кучка хрустальной пыли
+item.item_rhinestone_dust.name=Хрустальная пыль
+item.item_rh_pickaxe.name=Хрустальная кирка
+item.item_rh_axe.name=Хрустальный топор
+item.item_rh_sword.name=Хрустальный меч
+item.item_rh_shovel.name=Хрустальная лопата
+
+soulkeeper.xp=Опыт:

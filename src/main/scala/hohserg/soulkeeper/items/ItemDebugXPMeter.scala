@@ -1,7 +1,7 @@
 package hohserg.soulkeeper.items
 
 import hohserg.soulkeeper.XPUtils
-import hohserg.soulkeeper.capability.ExpInChunkProvider
+import hohserg.soulkeeper.capability.chunk.ExpInChunkProvider
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.text.TextComponentString

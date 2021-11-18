@@ -9,8 +9,8 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, SoundType}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.Item
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
+import net.minecraft.util.{BlockRenderLayer, EnumParticleTypes}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
@@ -38,6 +38,8 @@ object BlockDarkRhinestoneStalactite extends Block(Material.GLASS) {
 
   override def quantityDropped(state: IBlockState, fortune: Int, random: Random): Int = random.nextInt((fortune + 1) * 3) + 1
 
+  override def canSilkHarvest(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer): Boolean = true
+
   override def canPlaceBlockAt(worldIn: World, pos: BlockPos): Boolean = {
     val upState = worldIn.getBlockState(pos.up)
     val upBlock = upState.getBlock
@@ -48,9 +50,11 @@ object BlockDarkRhinestoneStalactite extends Block(Material.GLASS) {
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
-  override def canSilkHarvest(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer): Boolean = true
-
   override def getBlockLayer: BlockRenderLayer = BlockRenderLayer.TRANSLUCENT
+
+  /* water drip */
+  override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit =
+    worldIn.spawnParticle(EnumParticleTypes.WATER_DROP, pos.getX, pos.getY, pos.getZ, 0, 0, 0)
 
   @SubscribeEvent
   def removeOnTouchOverlay(e: RenderBlockOverlayEvent): Unit = {

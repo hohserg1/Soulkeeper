@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 
 /**
  * Copied from OpenBlocks:
- * https://github.com/OpenMods/OpenModsLib/blob/master/src/main/java/openmods/utils/EnchantmentUtils.java
+ * https://github.com/OpenMods/OpenModsLib/blob/1.12.X/src/main/java/openmods/utils/EnchantmentUtils.java
  */
 
 public class XPUtils {
@@ -17,15 +17,22 @@ public class XPUtils {
      * @return
      */
     public static int getPlayerXP(EntityPlayer player) {
-        return (int) (XPUtils.getExperienceForLevel(player.experienceLevel) + (player.experience * player.xpBarCap()));
+        return getExperienceForLevelAndBar(player.experienceLevel, player.experience);
+    }
+
+    public static int getExperienceForLevelAndBar(int experienceLevel, float experienceBar) {
+        return (int) (XPUtils.getExperienceForLevel(experienceLevel) + (experienceBar * xpBarCap(experienceLevel)));
+    }
+
+    public static void setPlayerXP(EntityPlayer player, int amount) {
+        player.experienceTotal = amount;
+        player.experienceLevel = XPUtils.getLevelForExperience(amount);
+        int expForLevel = XPUtils.getExperienceForLevel(player.experienceLevel);
+        player.experience = (float) (amount - expForLevel) / (float) player.xpBarCap();
     }
 
     public static void addPlayerXP(EntityPlayer player, int amount) {
-        int experience = getPlayerXP(player) + amount;
-        player.experienceTotal = experience;
-        player.experienceLevel = XPUtils.getLevelForExperience(experience);
-        int expForLevel = XPUtils.getExperienceForLevel(player.experienceLevel);
-        player.experience = (float) (experience - expForLevel) / (float) player.xpBarCap();
+        setPlayerXP(player, getPlayerXP(player) + amount);
     }
 
     public static int xpBarCap(int level) {
@@ -50,7 +57,7 @@ public class XPUtils {
     }
 
     public static int getXpToNextLevel(int level) {
-        int levelXP = XPUtils.getLevelForExperience(level);
+        int levelXP = XPUtils.getExperienceForLevel(level);
         int nextXP = XPUtils.getExperienceForLevel(level + 1);
         return nextXP - levelXP;
     }
@@ -63,5 +70,13 @@ public class XPUtils {
             level++;
             targetXp -= xpToNextLevel;
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("xpBarCap " + xpBarCap(100));
+        System.out.println("getXpToNextLevel " + getXpToNextLevel(100));
+
+        System.out.println("getExperienceForLevel " + getExperienceForLevel(100));
+        System.out.println("getTotalXPForLevel " + hohserg.soulkeeper.utils.XPUtils.getTotalXPForLevel(100, 0));
     }
 }
