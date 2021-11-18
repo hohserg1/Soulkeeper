@@ -7,8 +7,20 @@ idea {
 }
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
-        maven { url = "https://files.minecraftforge.net/maven" }
+        maven {
+            name = "Forge"
+            url = 'https://files.minecraftforge.net/maven'
+        }
+        maven {
+            name = 'spongepowered-repo'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+        }
+        maven {
+            name = "github"
+            url = "https://github.com/juanmuscaria/maven/raw/master"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
@@ -29,7 +41,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
+    version = "1.12.2-14.23.5.2847"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -63,6 +75,12 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'soulkeeper_at.cfg'
+    }
 }
 
 processResources {
