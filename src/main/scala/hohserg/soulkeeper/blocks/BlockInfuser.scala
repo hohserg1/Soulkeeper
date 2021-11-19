@@ -54,7 +54,7 @@ object BlockInfuser extends Block(Material.ROCK, MapColor.YELLOW) {
           } else {
             val tool = tile.inv.getStackInSlot(0)
             val toolXP = RhTool.getXp(tool)
-            if (toolXP >= tool.getMaxDamage || playerIn.isSneaking) {
+            if (toolXP >= tool.getMaxDamage || playerIn.isSneaking || XPUtils.getPlayerXP(playerIn) == 0) {
               tile.inv.setStackInSlot(0, ItemStack.EMPTY)
               tile.getWorld.spawnEntity(new EntityItem(tile.getWorld, tile.getPos.getX + 0.5, tile.getPos.getY + 0.8, tile.getPos.getZ + 0.5, tool.copy()))
 
