@@ -89,11 +89,12 @@ class ClientProxy extends CommonProxy {
 
   @SubscribeEvent
   def onMainMenu(event: GuiOpenEvent): Unit =
-    event.getGui match {
-      case guiMainMenu: GuiMainMenu => mc.displayGuiScreen(new GuiWorldSelection(guiMainMenu))
-      case selection: GuiWorldSelection =>
-        val guiListWorldSelection = new GuiListWorldSelection(selection, mc, 100, 100, 32, 100 - 64, 36)
-        Try(guiListWorldSelection.getListEntry(0).joinWorld())
-      case _ =>
-    }
+    if (Main.debugMode)
+      event.getGui match {
+        case guiMainMenu: GuiMainMenu => mc.displayGuiScreen(new GuiWorldSelection(guiMainMenu))
+        case selection: GuiWorldSelection =>
+          val guiListWorldSelection = new GuiListWorldSelection(selection, mc, 100, 100, 32, 100 - 64, 36)
+          Try(guiListWorldSelection.getListEntry(0).joinWorld())
+        case _ =>
+      }
 }
