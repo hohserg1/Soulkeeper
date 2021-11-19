@@ -3,14 +3,13 @@ package hohserg.soulkeeper.blocks
 import java.util.Random
 
 import hohserg.soulkeeper.Configuration
-import hohserg.soulkeeper.blocks.BlockDarkRhinestoneStalactite.{lightValue, setSoundType}
 import hohserg.soulkeeper.capability.chunk.ExpInChunkProvider
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.items.ItemTinyRhinestoneDust
-import net.minecraft.block.{Block, SoundType}
 import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
+import net.minecraft.block.{Block, SoundType}
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.player.EntityPlayer
@@ -64,7 +63,7 @@ object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
 
   /** drop **/
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    if (worldIn.getBlockState(pos).getValue(growProperty) == GrowStage.Ripe) {
+    if (worldIn.getBlockState(pos).getBlock == this && worldIn.getBlockState(pos).getValue(growProperty) == GrowStage.Ripe) {
       if (!worldIn.isRemote) {
         worldIn.setBlockState(pos, getDefaultState.withProperty(growProperty, GrowStage.Empty))
         worldIn.spawnEntity(new CustomEntityXPOrb(new EntityXPOrb(worldIn, pos.getX + hitX, pos.getY + hitX, pos.getZ + hitZ, Configuration.soulkeeperXPDrop)))
