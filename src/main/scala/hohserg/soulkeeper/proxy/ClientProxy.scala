@@ -9,6 +9,7 @@ import hohserg.soulkeeper.render._
 import hohserg.soulkeeper.{Main, XPUtils}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.{GuiListWorldSelection, GuiMainMenu, GuiWorldSelection}
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.block.model.{BuiltInModel, IBakedModel, ItemOverrideList, ModelResourceLocation}
 import net.minecraft.client.renderer.entity.{Render, RenderManager}
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
@@ -50,6 +51,7 @@ class ClientProxy extends CommonProxy {
 
   @SubscribeEvent
   def onModelRegister(event: ModelRegistryEvent): Unit = {
+    ModelLoader.setCustomModelResourceLocation(ItemEmptyBottle, 0, new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory"))
     items.foreach(i => ModelLoader.setCustomModelResourceLocation(i, 0, new ModelResourceLocation(i.getRegistryName(), "inventory")))
   }
 
@@ -72,18 +74,26 @@ class ClientProxy extends CommonProxy {
     }
 
     val bottleKey = new ModelResourceLocation(ItemEmptyBottle.getRegistryName(), "inventory")
-    val contentKey = new ModelResourceLocation(ItemFilledBottle.getRegistryName(), "inventory")
-
+    val bottleCorkKey = new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory")
     val bottleModel = event.getModelRegistry.getObject(bottleKey)
-    val contentModel = event.getModelRegistry.getObject(contentKey)
+    val corkModel = event.getModelRegistry.getObject(bottleCorkKey)
+    event.getModelRegistry.putObject(bottleKey, new CombinedModel(corkModel, bottleModel))
 
-    event.getModelRegistry.putObject(contentKey, new BuiltInModel(bottleModel.getItemCameraTransforms, ItemOverrideList.NONE))
+
+    val contentKey = new ModelResourceLocation(ItemFilledBottle.getRegistryName(), "inventory")
+    val contentModel = event.getModelRegistry.getObject(contentKey)
+    val combinedBottleModel = event.getModelRegistry.getObject(bottleKey)
+
+    event.getModelRegistry.putObject(contentKey, new BuiltInModel(combinedBottleModel.getItemCameraTransforms, ItemOverrideList.NONE))
 
     val bottleStack = new ItemStack(ItemEmptyBottle)
     ItemFilledBottle.setTileEntityItemStackRenderer(new TileEntityItemStackRenderer {
-      override def renderByItem(contentStack : ItemStack, partialTicks: Float): Unit = {
+      override def renderByItem(contentStack: ItemStack, partialTicks: Float): Unit = {
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(0.5, 0.5, 0.5)
         Minecraft.getMinecraft.getRenderItem.renderItem(contentStack, contentModel)
-        Minecraft.getMinecraft.getRenderItem.renderItem(bottleStack, bottleModel)
+        Minecraft.getMinecraft.getRenderItem.renderItem(bottleStack, combinedBottleModel)
+        GlStateManager.popMatrix()
       }
     })
   }
@@ -95,7 +105,7 @@ class ClientProxy extends CommonProxy {
         event.getMap.registerSprite(new ResourceLocation(enchantedTextureName))
         event.getMap.registerSprite(new ResourceLocation(emptyTextureName))
     }
-    //event.getMap.registerSprite(new ResourceLocation(FilledBottleModel.contentTextureName))
+    event.getMap.registerSprite(new ResourceLocation(Main.modid,"items/item_empty_bottle_cork"))
   }
 
   @SubscribeEvent

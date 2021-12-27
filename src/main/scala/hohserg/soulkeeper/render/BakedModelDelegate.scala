@@ -26,9 +26,4 @@ class BakedModelDelegate(base: IBakedModel) extends IBakedModel {
   override def getOverrides: ItemOverrideList = base.getOverrides
 
   override def getItemCameraTransforms: ItemCameraTransforms = base.getItemCameraTransforms
-
-  override def handlePerspective(cameraTransformType: ItemCameraTransforms.TransformType): Pair[_ <: IBakedModel, Matrix4f] = {
-    val matrix4f = base.handlePerspective(cameraTransformType).getRight
-    Pair.of(this, matrix4f)
-  }
 }
