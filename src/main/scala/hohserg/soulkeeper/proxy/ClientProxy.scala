@@ -3,13 +3,16 @@ package hohserg.soulkeeper.proxy
 import codechicken.lib.packet.PacketCustom
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
+import hohserg.soulkeeper.items.bottle.{ItemEmptyBottle, ItemFilledBottle}
 import hohserg.soulkeeper.network.ClientPacketHandler
-import hohserg.soulkeeper.render.{CustomXPOrbRenderer, RenderItemWithCustomOverlay, RhToolModel, TileInfuserRenderer}
+import hohserg.soulkeeper.render._
 import hohserg.soulkeeper.{Main, XPUtils}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.{GuiListWorldSelection, GuiMainMenu, GuiWorldSelection}
-import net.minecraft.client.renderer.block.model.{IBakedModel, ModelResourceLocation}
+import net.minecraft.client.renderer.block.model.{BuiltInModel, IBakedModel, ItemOverrideList, ModelResourceLocation}
 import net.minecraft.client.renderer.entity.{Render, RenderManager}
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
+import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event._
 import net.minecraftforge.client.model.ModelLoader
@@ -47,9 +50,7 @@ class ClientProxy extends CommonProxy {
 
   @SubscribeEvent
   def onModelRegister(event: ModelRegistryEvent): Unit = {
-    //blocks.map(Item.getItemFromBlock).foreach(i => ModelLoader.setCustomModelResourceLocation(i, 0, new ModelResourceLocation(i.getRegistryName(), "inventory")))
     items.foreach(i => ModelLoader.setCustomModelResourceLocation(i, 0, new ModelResourceLocation(i.getRegistryName(), "inventory")))
-
   }
 
   lazy val toolModels =
@@ -69,6 +70,22 @@ class ClientProxy extends CommonProxy {
       case (key, (model, _, _)) =>
         event.getModelRegistry.putObject(key, model(event.getModelRegistry.getObject(key)))
     }
+
+    val bottleKey = new ModelResourceLocation(ItemEmptyBottle.getRegistryName(), "inventory")
+    val contentKey = new ModelResourceLocation(ItemFilledBottle.getRegistryName(), "inventory")
+
+    val bottleModel = event.getModelRegistry.getObject(bottleKey)
+    val contentModel = event.getModelRegistry.getObject(contentKey)
+
+    event.getModelRegistry.putObject(contentKey, new BuiltInModel(bottleModel.getItemCameraTransforms, ItemOverrideList.NONE))
+
+    val bottleStack = new ItemStack(ItemEmptyBottle)
+    ItemFilledBottle.setTileEntityItemStackRenderer(new TileEntityItemStackRenderer {
+      override def renderByItem(contentStack : ItemStack, partialTicks: Float): Unit = {
+        Minecraft.getMinecraft.getRenderItem.renderItem(contentStack, contentModel)
+        Minecraft.getMinecraft.getRenderItem.renderItem(bottleStack, bottleModel)
+      }
+    })
   }
 
   @SubscribeEvent
@@ -78,6 +95,7 @@ class ClientProxy extends CommonProxy {
         event.getMap.registerSprite(new ResourceLocation(enchantedTextureName))
         event.getMap.registerSprite(new ResourceLocation(emptyTextureName))
     }
+    //event.getMap.registerSprite(new ResourceLocation(FilledBottleModel.contentTextureName))
   }
 
   @SubscribeEvent

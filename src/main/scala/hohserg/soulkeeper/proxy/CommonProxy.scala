@@ -12,6 +12,7 @@ import hohserg.soulkeeper.capability.chunk.{ExpInChunk, ExpInChunkProvider, ExpI
 import hohserg.soulkeeper.capability.player.{ExpInPlayer, ExpInPlayerStorage}
 import hohserg.soulkeeper.capability.tile.PrevLootTable
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
+import hohserg.soulkeeper.items.bottle.{ItemEmptyBottle, ItemFilledBottle}
 import hohserg.soulkeeper.items.tools._
 import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import hohserg.soulkeeper.network.ServerPacketHandler
@@ -83,7 +84,7 @@ class CommonProxy {
 
   lazy val blocks = Seq(BlockDarkRhinestone, BlockSoulkeeperPlant, BlockDarkRhinestonePowder, BlockDarkRhinestoneStalactite, BlockInfuser)
   lazy val tools = Seq(ItemRhPickaxe, ItemRhAxe, ItemRhShovel, ItemRhSword)
-  lazy val items = Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter) ++ blocks.map(new ItemBlock(_)) ++ tools
+  lazy val items = Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemEmptyBottle, ItemFilledBottle) ++ blocks.map(new ItemBlock(_)) ++ tools
 
   def toId(r: String): String = {
     val r1 = r.flatMap(c => if (c.isUpper) "_" + c else "" + c)
@@ -144,6 +145,7 @@ class CommonProxy {
     event.addCapability(ExpInChunkProvider.name, new ExpInChunkProvider)
 
   ///summon minecraft:xp_orb ~ ~-10 ~ {Value:7}
+  ///summon minecraft:xp_orb ~-3 ~+3 ~ {Value:100}
   @SubscribeEvent
   def onExpOrbWorldEnter(event: EntityJoinWorldEvent): Unit = {
     val world = event.getWorld

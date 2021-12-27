@@ -12,7 +12,7 @@ object Main {
   @SidedProxy(serverSide = "hohserg.soulkeeper.proxy.CommonProxy", clientSide = "hohserg.soulkeeper.proxy.ClientProxy")
   var proxy: CommonProxy = _
 
-  final val debugMode = false
+  final val debugMode = true
 
 
   @EventHandler

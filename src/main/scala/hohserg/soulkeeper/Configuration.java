@@ -52,4 +52,10 @@ public class Configuration {
     @Config.RangeInt(min = 1)
     public static int rhinestoneToolsChestLootRarity = 1000;
 
+    @Config.RangeInt(min = 1)
+    public static int rhinestoneBottleCapacity = 20;
+
+    @Config.RangeInt(min = 1)
+    public static int rhinestoneOrbCapacity = 20000;
+
 }
