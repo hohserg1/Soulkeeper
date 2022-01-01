@@ -87,7 +87,12 @@ class ClientProxy extends CommonProxy {
     val contentModel = getModel(contentKey)
     val combinedBottleModel = getModel(bottleKey)
 
-    setModel(contentKey, new BuiltInModel(combinedBottleModel.getItemCameraTransforms, ItemOverrideList.NONE))
+    setModel(contentKey, new BuiltInModel(bottleModel.getItemCameraTransforms, ItemOverrideList.NONE){
+      override def handlePerspective(cameraTransformType: ItemCameraTransforms.TransformType): tuple.Pair[_ <: IBakedModel, Matrix4f] = {
+        val matrix4f = bottleModel.handlePerspective(cameraTransformType).getRight
+        Pair.of(this, matrix4f)
+      }
+    })
 
     val bottleStack = new ItemStack(ItemEmptyBottle)
     ItemFilledBottle.setTileEntityItemStackRenderer(new TileEntityItemStackRenderer {
