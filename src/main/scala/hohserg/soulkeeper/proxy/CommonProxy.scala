@@ -15,6 +15,7 @@ import hohserg.soulkeeper.capability.tile.PrevLootTable
 import hohserg.soulkeeper.capability.{DummyFactory, DummyStorage}
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.items.bottle.{ItemDustBottle, ItemEmptyBottle, ItemFilledBottle}
+import hohserg.soulkeeper.items.fake.ItemEmptyBottleCork
 import hohserg.soulkeeper.items.tools._
 import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import hohserg.soulkeeper.network.ServerPacketHandler
@@ -77,7 +78,7 @@ class CommonProxy {
 
   lazy val blocks = Seq(BlockDarkRhinestone, BlockSoulkeeperPlant, BlockDarkRhinestonePowder, BlockDarkRhinestoneStalactite, BlockInfuser)
   lazy val tools = Seq(ItemRhPickaxe, ItemRhAxe, ItemRhShovel, ItemRhSword)
-  lazy val items = Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemDustBottle, ItemEmptyBottle, ItemFilledBottle) ++ blocks.map(new ItemBlock(_)) ++ tools
+  lazy val items = Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemDustBottle, ItemEmptyBottle, ItemFilledBottle) ++ blocks.map(new ItemBlock(_)) ++ tools ++ Seq(ItemEmptyBottleCork)
 
   def toId(r: String): String = {
     val r1 = r.flatMap(c => if (c.isUpper) "_" + c else "" + c)

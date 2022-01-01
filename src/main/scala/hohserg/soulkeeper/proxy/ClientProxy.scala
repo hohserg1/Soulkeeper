@@ -7,10 +7,11 @@ import hohserg.soulkeeper.items.bottle.{ItemEmptyBottle, ItemFilledBottle}
 import hohserg.soulkeeper.network.ClientPacketHandler
 import hohserg.soulkeeper.render._
 import hohserg.soulkeeper.{Main, XPUtils}
+import javax.vecmath.Matrix4f
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.{GuiListWorldSelection, GuiMainMenu, GuiWorldSelection}
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.block.model.{BuiltInModel, IBakedModel, ItemOverrideList, ModelResourceLocation}
+import net.minecraft.client.renderer.block.model._
 import net.minecraft.client.renderer.entity.{Render, RenderManager}
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.item.ItemStack
@@ -20,6 +21,8 @@ import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.client.registry.{ClientRegistry, IRenderFactory, RenderingRegistry}
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.commons.lang3.tuple
+import org.apache.commons.lang3.tuple.Pair
 
 import scala.util.Try
 
@@ -51,7 +54,7 @@ class ClientProxy extends CommonProxy {
 
   @SubscribeEvent
   def onModelRegister(event: ModelRegistryEvent): Unit = {
-    ModelLoader.setCustomModelResourceLocation(ItemEmptyBottle, 0, new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory"))
+    //ModelLoader.setCustomModelResourceLocation(ItemEmptyBottle, 0, new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory"))
     items.foreach(i => ModelLoader.setCustomModelResourceLocation(i, 0, new ModelResourceLocation(i.getRegistryName(), "inventory")))
   }
 
@@ -80,7 +83,7 @@ class ClientProxy extends CommonProxy {
     val bottleCorkKey = new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory")
     val bottleModel = getModel(bottleKey)
     val corkModel = getModel(bottleCorkKey)
-    setModel(bottleKey, new CombinedModel(corkModel, bottleModel))
+    setModel(bottleKey, new BottleModel(corkModel, bottleModel))
 
 
     val contentKey = new ModelResourceLocation(ItemFilledBottle.getRegistryName(), "inventory")
