@@ -84,7 +84,7 @@ class CommonProxy {
 
   lazy val blocks = Seq(BlockDarkRhinestone, BlockSoulkeeperPlant, BlockDarkRhinestonePowder, BlockDarkRhinestoneStalactite, BlockInfuser)
   lazy val tools = Seq(ItemRhPickaxe, ItemRhAxe, ItemRhShovel, ItemRhSword)
-  lazy val items = Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemEmptyBottle, ItemFilledBottle) ++ blocks.map(new ItemBlock(_)) ++ tools
+  lazy val items = Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemDustBottle, ItemEmptyBottle, ItemFilledBottle) ++ blocks.map(new ItemBlock(_)) ++ tools
 
   def toId(r: String): String = {
     val r1 = r.flatMap(c => if (c.isUpper) "_" + c else "" + c)

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " r ",
+    "R R",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "soulkeeper:item_rhinestone_dust"
+    },
+    "r": {
+      "item": "soulkeeper:item_tiny_rhinestone_dust"
+    }
+  },
+  "result": {
+    "item": "soulkeeper:item_dust_bottle",
+    "count": 4
+  }
+}

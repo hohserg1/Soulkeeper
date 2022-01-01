@@ -3,7 +3,6 @@ package hohserg.soulkeeper.items.bottle
 import java.util
 
 import hohserg.soulkeeper.{Configuration, XPUtils}
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.client.resources.I18n
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.EntityLivingBase
@@ -41,6 +40,8 @@ object ItemFilledBottle extends Item {
       case player: EntityPlayer =>
         XPUtils.addPlayerXP(player, getStoredXP(stack))
         stack.shrink(1)
+
+        player.getCooldownTracker.setCooldown(ItemEmptyBottle, 7)
 
         new ItemStack(ItemEmptyBottle)
 
