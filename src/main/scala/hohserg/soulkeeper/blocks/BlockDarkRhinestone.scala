@@ -1,11 +1,11 @@
 package hohserg.soulkeeper.blocks
 
-import net.minecraft.block.material.Material
+import net.minecraft.block.material.{MapColor, Material}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, SoundType}
 import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType}
 
-object BlockDarkRhinestone extends Block(Material.GLASS) {
+object BlockDarkRhinestone extends Block(Material.GLASS) with RhColor  {
 
   setHardness(5)
   setResistance(10)

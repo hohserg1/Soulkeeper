@@ -33,7 +33,7 @@ class CustomEntityXPOrb(world: World) extends EntityXPOrb(world) with IEntityAdd
 
     if (!world.isRemote) {
 
-      if (world.getBlockState(underPos).getBlock != BlockDarkRhinestone && world.getBlockState(underPos).getBlock != BlockDarkRhinestonePowder )
+      if (world.getBlockState(underPos).getBlock != BlockDarkRhinestone && world.getBlockState(underPos).getBlock != BlockDarkRhinestonePowder)
         if (halfOnFallingCooldown == 0) {
           halfOnFallingCooldown = 20 * 10
           halfXPWithChunk()

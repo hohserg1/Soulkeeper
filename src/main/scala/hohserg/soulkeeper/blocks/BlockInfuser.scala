@@ -1,7 +1,9 @@
 package hohserg.soulkeeper.blocks
 
 import hohserg.soulkeeper.XPUtils
-import hohserg.soulkeeper.api.{Capabilities, CapabilityXPContainer}
+import hohserg.soulkeeper.api.crafting.{DummyInfuserRecipe, InfuserRecipe, StepInfuserRecipe}
+import hohserg.soulkeeper.api.{CapabilityXPContainer, Registries}
+import hohserg.soulkeeper.utils.ItemStackRepr
 import javax.annotation.Nonnull
 import net.minecraft.block.Block
 import net.minecraft.block.material.{MapColor, Material}
@@ -19,7 +21,7 @@ import net.minecraft.world.{IBlockAccess, World, WorldServer}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.items.{CapabilityItemHandler, ItemStackHandler}
 
-object BlockInfuser extends Block(Material.ROCK, MapColor.YELLOW) {
+object BlockInfuser extends Block(Material.ROCK, MapColor.PURPLE) {
   setLightOpacity(0)
   setHardness(5)
   setResistance(2000)
@@ -41,34 +43,87 @@ object BlockInfuser extends Block(Material.ROCK, MapColor.YELLOW) {
     else
       BlockFaceShape.UNDEFINED
 
+  import collection.JavaConverters._
+
+  lazy val recipeMap: Map[ItemStackRepr, InfuserRecipe] = Registries.INFUSER_RECIPES.getValuesCollection.asScala.flatMap {
+    case r: DummyInfuserRecipe =>
+      r.input.getMatchingStacks.map(ItemStackRepr.fromStack).map(_ -> r.asInstanceOf[InfuserRecipe])
+    case r: StepInfuserRecipe =>
+      r.input.getMatchingStacks.flatMap {
+        start =>
+          val capa = CapabilityXPContainer(start)
+          if (capa.getClass == classOf[CapabilityXPContainer.Impl])
+            Set(ItemStackRepr.fromStack(start))
+          else {
+            val startXP = capa.getXp
+            (for (i <- 0 until r.stepAmount) yield {
+              val variant = start.copy()
+              CapabilityXPContainer(variant).setXp(startXP + i * r.stepXP)
+              ItemStackRepr.fromStack(variant)
+            }).toSet
+          }
+      }.map(_ -> r.asInstanceOf[InfuserRecipe])
+    case r =>
+      throw new IllegalStateException("unsupported infuser recipe type: " + r.getClass)
+  }.toMap
+
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (!worldIn.isRemote)
       worldIn.getTileEntity(pos) match {
         case tile: TileInfuser =>
+
+          def ejectItem(): Unit = {
+            val input = tile.inv.getStackInSlot(0)
+            tile.inv.setStackInSlot(0, ItemStack.EMPTY)
+            tile.getWorld.spawnEntity(new EntityItem(tile.getWorld, tile.getPos.getX + 0.5, tile.getPos.getY + 0.8, tile.getPos.getZ + 0.5, input.copy()))
+          }
+
           if (tile.inv.getStackInSlot(0).isEmpty) {
             val stackInHand = playerIn.getHeldItem(hand)
-            if (stackInHand.hasCapability(Capabilities.CAPABILITY_XP_CONTAINER, null)) {
-              val xpContainer = stackInHand.copy()
-              xpContainer.setCount(1)
+            if (recipeMap.contains(ItemStackRepr.fromStack(stackInHand))) {
+              val input = stackInHand.copy()
+              input.setCount(1)
               stackInHand.shrink(1)
-              tile.inv.setStackInSlot(0, xpContainer)
+              tile.inv.setStackInSlot(0, input)
             }
           } else {
-            val xpContainer = tile.inv.getStackInSlot(0)
-            val capa = CapabilityXPContainer(xpContainer)
-            if (capa != null) {
-              val curXP = capa.getXp
-              val playerXP = XPUtils.getPlayerXP(playerIn)
+            val input = tile.inv.getStackInSlot(0)
+            if (playerIn.isSneaking)
+              ejectItem()
+            else {
+              val repr = ItemStackRepr.fromStack(input)
+              val maybeRecipe = recipeMap.get(repr)
+              maybeRecipe.foreach {
+                case r: DummyInfuserRecipe =>
+                  val playerXP = XPUtils.getPlayerXP(playerIn)
+                  if (playerXP >= r.xp) {
+                    XPUtils.setPlayerXP(playerIn, playerXP - r.xp)
+                    tile.inv.setStackInSlot(0, r.output.copy())
+                  } else
+                    ejectItem()
 
-              if (curXP >= capa.getXpCapacity || playerXP == 0 || playerIn.isSneaking) {
-                tile.inv.setStackInSlot(0, ItemStack.EMPTY)
-                tile.getWorld.spawnEntity(new EntityItem(tile.getWorld, tile.getPos.getX + 0.5, tile.getPos.getY + 0.8, tile.getPos.getZ + 0.5, xpContainer.copy()))
+                case r: StepInfuserRecipe =>
+                  val capa = CapabilityXPContainer(input)
+                  if (capa != null) {
+                    val curXP = capa.getXp
+                    val playerXP = XPUtils.getPlayerXP(playerIn)
 
-              } else if (curXP < capa.getXpCapacity && playerXP > 0) {
-                XPUtils.setPlayerXP(playerIn, playerXP - 1)
-                capa.setXp(curXP + 1)
+                    if (curXP >= capa.getXpCapacity || curXP >= r.stepXP * r.stepAmount || playerXP < r.stepXP)
+                      ejectItem()
+
+                    else if (curXP < capa.getXpCapacity && playerXP >= r.stepXP) {
+                      XPUtils.setPlayerXP(playerIn, playerXP - r.stepXP)
+                      capa.setXp(curXP + r.stepXP)
+                      tile.sendUpdates()
+                    }
+
+                  }
               }
 
+              if (maybeRecipe.isEmpty) {
+                tile.inv.setStackInSlot(0, ItemStack.EMPTY)
+                tile.getWorld.spawnEntity(new EntityItem(tile.getWorld, tile.getPos.getX + 0.5, tile.getPos.getY + 0.8, tile.getPos.getZ + 0.5, input.copy()))
+              }
             }
           }
         case _ =>

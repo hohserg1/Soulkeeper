@@ -52,6 +52,10 @@ public class Configuration {
     @Config.RangeInt(min = 1)
     public static int rhinestoneToolsChestLootRarity = 1000;
 
+    @Config.Comment({"How many xp required for one infuse of Rhinestone Poweder block","Number of infuses is 16"})
+    @Config.RangeInt(min = 1)
+    public static int xpPerRhinestonePowderInfuse = 10;
+
     @Config.RangeInt(min = 1)
     public static int rhinestoneBottleCapacity = 50;
 

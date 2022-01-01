@@ -2,7 +2,10 @@ package hohserg.soulkeeper.render
 
 import codechicken.lib.vec.Vector3
 import hohserg.soulkeeper.api.CapabilityXPContainer
+import hohserg.soulkeeper.api.crafting.{DummyInfuserRecipe, StepInfuserRecipe}
+import hohserg.soulkeeper.blocks.BlockInfuser
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
+import hohserg.soulkeeper.utils.ItemStackRepr
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
@@ -25,7 +28,13 @@ class TileInfuserRenderer extends TileEntitySpecialRenderer[TileInfuser] {
       Minecraft.getMinecraft.getRenderItem.renderItem(tool, TransformType.GROUND)
       GlStateManager.popMatrix()
 
-      val text = I18n.format("soulkeeper.xp") + " " + CapabilityXPContainer(tool).getXp + "/" + tool.getMaxDamage
+      val text = BlockInfuser.recipeMap.get(ItemStackRepr.fromStack(tool)).map {
+        case r: DummyInfuserRecipe =>
+          I18n.format("soulkeeper.xp") + " 0/" + r.xp
+        case r: StepInfuserRecipe =>
+          val capa = CapabilityXPContainer(tool)
+          I18n.format("soulkeeper.xp") + " " + capa.getXp + "/" + capa.getXpCapacity
+      }.getOrElse("")
       //val a = Math.toRadians(rendererDispatcher.entityYaw + 90)
       //val dx = Math.cos(a)
       //val dz = Math.sin(a)
