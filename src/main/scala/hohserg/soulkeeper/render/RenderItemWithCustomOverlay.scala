@@ -15,34 +15,36 @@ import net.minecraft.world.World
 class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItem(getMinecraft.getTextureManager, getMinecraft.modelManager, getMinecraft.itemColors) {
 
   private def renderSpecialBar(stack: ItemStack, xPosition: Int, yPosition: Int) = {
-    if (!stack.isEmpty && stack.getItem.isInstanceOf[RhTool]) {
-      GlStateManager.disableLighting()
-      GlStateManager.disableDepth()
-      GlStateManager.disableTexture2D()
-      GlStateManager.disableAlpha()
-      GlStateManager.disableBlend()
+    stack.getItem match {
+      case tool: RhTool =>
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableAlpha()
+        GlStateManager.disableBlend()
 
-      val durability = stack.getMaxDamage - stack.getItemDamage
-      val xp = RhTool.getXp(stack)
-      val max = stack.getMaxDamage
+        val durability = stack.getMaxDamage - stack.getItemDamage
+        val xp = tool.getXp(stack)
+        val max = stack.getMaxDamage
 
-      val barSize: Int = 13
+        val barSize: Int = 13
 
-      def barProgress(v: Int): Int =
-        (v.toFloat / max * barSize).round
+        def barProgress(v: Int): Int =
+          (v.toFloat / max * barSize).round
 
-      val p1 = barProgress(xp)
-      val p2 = barProgress(durability)
+        val p1 = barProgress(xp)
+        val p2 = barProgress(durability)
 
-      drawRect(xPosition + 2, yPosition + 12.5, 13, 3, 0, 0, 0, 255)
-      drawRect(xPosition + 2, yPosition + 14, p2, 1, 0, 255, 0, 255)
-      drawRect(xPosition + 2, yPosition + 12.5, p1, 1, 255, 157, 0, 255)
+        drawRect(xPosition + 2, yPosition + 12.5, 13, 3, 0, 0, 0, 255)
+        drawRect(xPosition + 2, yPosition + 14, p2, 1, 0, 255, 0, 255)
+        drawRect(xPosition + 2, yPosition + 12.5, p1, 1, 255, 157, 0, 255)
 
-      GlStateManager.enableBlend()
-      GlStateManager.enableAlpha()
-      GlStateManager.enableTexture2D()
-      GlStateManager.enableLighting()
-      GlStateManager.enableDepth()
+        GlStateManager.enableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableLighting()
+        GlStateManager.enableDepth()
+      case _ =>
     }
   }
 

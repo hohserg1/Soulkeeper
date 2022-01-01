@@ -1,7 +1,7 @@
 package hohserg.soulkeeper.blocks
 
 import hohserg.soulkeeper.XPUtils
-import hohserg.soulkeeper.items.tools.RhTool
+import hohserg.soulkeeper.api.{Capabilities, CapabilityXPContainer}
 import javax.annotation.Nonnull
 import net.minecraft.block.Block
 import net.minecraft.block.material.{MapColor, Material}
@@ -46,24 +46,29 @@ object BlockInfuser extends Block(Material.ROCK, MapColor.YELLOW) {
       worldIn.getTileEntity(pos) match {
         case tile: TileInfuser =>
           if (tile.inv.getStackInSlot(0).isEmpty) {
-            if (playerIn.getHeldItem(hand).getItem.isInstanceOf[RhTool]) {
-              val tool = playerIn.getHeldItem(hand).copy()
-              playerIn.setHeldItem(hand, ItemStack.EMPTY)
-              tile.inv.setStackInSlot(0, tool)
+            val stackInHand = playerIn.getHeldItem(hand)
+            if (stackInHand.hasCapability(Capabilities.CAPABILITY_XP_CONTAINER, null)) {
+              val xpContainer = stackInHand.copy()
+              xpContainer.setCount(1)
+              stackInHand.shrink(1)
+              tile.inv.setStackInSlot(0, xpContainer)
             }
           } else {
-            val tool = tile.inv.getStackInSlot(0)
-            val toolXP = RhTool.getXp(tool)
-            if (toolXP >= tool.getMaxDamage || playerIn.isSneaking || XPUtils.getPlayerXP(playerIn) == 0) {
-              tile.inv.setStackInSlot(0, ItemStack.EMPTY)
-              tile.getWorld.spawnEntity(new EntityItem(tile.getWorld, tile.getPos.getX + 0.5, tile.getPos.getY + 0.8, tile.getPos.getZ + 0.5, tool.copy()))
-
-            } else if (toolXP < tool.getMaxDamage) {
+            val xpContainer = tile.inv.getStackInSlot(0)
+            val capa = CapabilityXPContainer(xpContainer)
+            if (capa != null) {
+              val curXP = capa.getXp
               val playerXP = XPUtils.getPlayerXP(playerIn)
-              if (playerXP > 0) {
+
+              if (curXP >= capa.getXpCapacity || playerXP == 0 || playerIn.isSneaking) {
+                tile.inv.setStackInSlot(0, ItemStack.EMPTY)
+                tile.getWorld.spawnEntity(new EntityItem(tile.getWorld, tile.getPos.getX + 0.5, tile.getPos.getY + 0.8, tile.getPos.getZ + 0.5, xpContainer.copy()))
+
+              } else if (curXP < capa.getXpCapacity && playerXP > 0) {
                 XPUtils.setPlayerXP(playerIn, playerXP - 1)
-                RhTool.setXp(tool, toolXP + 1)
+                capa.setXp(curXP + 1)
               }
+
             }
           }
         case _ =>

@@ -1,24 +1,26 @@
 package hohserg.soulkeeper.proxy
 
 import java.util.Random
-import java.util.concurrent.Callable
 
 import codechicken.lib.packet.PacketCustom
 import hohserg.soulkeeper.Configuration._
+import hohserg.soulkeeper.api.crafting.{DummyInfuserRecipe, InfuserRecipe, StepInfuserRecipe}
+import hohserg.soulkeeper.api.{CapabilityXPContainer, ItemXPContainer}
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
 import hohserg.soulkeeper.blocks._
 import hohserg.soulkeeper.capability.Capabilities._
 import hohserg.soulkeeper.capability.chunk.{ExpInChunk, ExpInChunkProvider, ExpInChunkStorage}
 import hohserg.soulkeeper.capability.player.{ExpInPlayer, ExpInPlayerStorage}
 import hohserg.soulkeeper.capability.tile.PrevLootTable
+import hohserg.soulkeeper.capability.{DummyFactory, DummyStorage}
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
-import hohserg.soulkeeper.items.bottle.{ItemEmptyBottle, ItemFilledBottle}
+import hohserg.soulkeeper.items.bottle.{ItemDustBottle, ItemEmptyBottle, ItemFilledBottle}
 import hohserg.soulkeeper.items.tools._
 import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import hohserg.soulkeeper.network.ServerPacketHandler
 import hohserg.soulkeeper.utils.AnvilUtils
 import hohserg.soulkeeper.worldgen.{SoulkeeperPlantGenerator, StalactiteGenerator}
-import hohserg.soulkeeper.{Main, XPUtils}
+import hohserg.soulkeeper.{Configuration, Main, XPUtils}
 import net.minecraft.advancements._
 import net.minecraft.advancements.critereon.{EnchantedItemTrigger, ItemPredicate, MinMaxBounds}
 import net.minecraft.block.Block
@@ -28,15 +30,14 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
 import net.minecraft.init.Items
 import net.minecraft.inventory.{ContainerChest, InventoryLargeChest}
+import net.minecraft.item.crafting.Ingredient
 import net.minecraft.item.{Item, ItemBlock, ItemStack}
-import net.minecraft.nbt.NBTBase
 import net.minecraft.tileentity.{TileEntity, TileEntityChest, TileEntityLockableLoot}
-import net.minecraft.util.{EnumFacing, ResourceLocation}
+import net.minecraft.util.ResourceLocation
 import net.minecraft.world.DimensionType
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.capabilities.Capability.IStorage
-import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
+import net.minecraftforge.common.capabilities.CapabilityManager
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent
 import net.minecraftforge.event.entity.player.{PlayerContainerEvent, PlayerInteractEvent}
 import net.minecraftforge.event.entity.{EntityEvent, EntityJoinWorldEvent}
@@ -46,6 +47,7 @@ import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostIniti
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent
 import net.minecraftforge.fml.common.registry.{EntityEntry, EntityEntryBuilder, GameRegistry}
+import net.minecraftforge.registries.RegistryBuilder
 
 class CommonProxy {
 
@@ -53,19 +55,10 @@ class CommonProxy {
     PacketCustom.assignHandler(Main.modid, new ServerPacketHandler)
     MinecraftForge.EVENT_BUS.register(this)
     FMLCommonHandler.instance().bus().register(this)
-    CapabilityManager.INSTANCE.register(classOf[ExpInChunk], new ExpInChunkStorage, new Callable[ExpInChunk] {
-      override def call(): ExpInChunk = new ExpInChunk
-    })
-    CapabilityManager.INSTANCE.register(classOf[ExpInPlayer], new ExpInPlayerStorage, new Callable[ExpInPlayer] {
-      override def call(): ExpInPlayer = new ExpInPlayer
-    })
-    CapabilityManager.INSTANCE.register(classOf[PrevLootTable], new IStorage[PrevLootTable] {
-      override def writeNBT(capability: Capability[PrevLootTable], instance: PrevLootTable, side: EnumFacing): NBTBase = ???
-
-      override def readNBT(capability: Capability[PrevLootTable], instance: PrevLootTable, side: EnumFacing, nbt: NBTBase): Unit = ???
-    }, new Callable[PrevLootTable] {
-      override def call(): PrevLootTable = new PrevLootTable
-    })
+    CapabilityManager.INSTANCE.register(classOf[ExpInChunk], new ExpInChunkStorage, DummyFactory(() => new ExpInChunk))
+    CapabilityManager.INSTANCE.register(classOf[ExpInPlayer], new ExpInPlayerStorage, DummyFactory(() => new ExpInPlayer))
+    CapabilityManager.INSTANCE.register(classOf[PrevLootTable], new DummyStorage[PrevLootTable], DummyFactory(() => new PrevLootTable))
+    CapabilityManager.INSTANCE.register(classOf[CapabilityXPContainer], new DummyStorage[CapabilityXPContainer], DummyFactory(() => null))
   }
 
   def init(event: FMLInitializationEvent): Unit = {
@@ -185,8 +178,10 @@ class CommonProxy {
     val currXP = XPUtils.getPlayerXP(player)
     val prevXP = XPUtils.getExperienceForLevelAndBar(player.experienceLevel + level, player.experience)
     val enchantCost = prevXP - currXP
-    if (stack.getItem.isInstanceOf[RhTool])
-      RhTool.setXp(stack, RhTool.getXp(stack) + enchantCost)
+    stack.getItem match {
+      case tool: RhTool => tool.setXp(stack, tool.getXp(stack) + enchantCost)
+      case _ =>
+    }
   }
 
   @SubscribeEvent
@@ -220,18 +215,21 @@ class CommonProxy {
 
   @SubscribeEvent
   def onEnchantItemOnAnvil(event: AnvilUpdateEvent): Unit =
-    if (event.getLeft.getItem.isInstanceOf[RhTool])
-      AnvilUtils.getActualAnvilRecipe(event).foreach { recipe =>
-        val result = recipe.result.copy()
+    event.getLeft.getItem match {
+      case tool: RhTool =>
+        AnvilUtils.getActualAnvilRecipe(event).foreach { recipe =>
+          val result = recipe.result.copy()
 
-        RhTool.setXp(result, RhTool.getXp(result) + XPUtils.getExperienceForLevel(recipe.xpCost))
-        if (result.getEnchantmentTagList.equals(event.getLeft.getEnchantmentTagList))
-          result.setRepairCost(event.getLeft.getRepairCost)
+          tool.setXp(result, tool.getXp(result) + XPUtils.getExperienceForLevel(recipe.xpCost))
+          if (result.getEnchantmentTagList.equals(event.getLeft.getEnchantmentTagList))
+            result.setRepairCost(event.getLeft.getRepairCost)
 
-        event.setOutput(result)
-        event.setCost(recipe.xpCost)
-        event.setMaterialCost(recipe.right.getCount)
-      }
+          event.setOutput(result)
+          event.setCost(recipe.xpCost)
+          event.setMaterialCost(recipe.right.getCount)
+        }
+      case _ =>
+    }
 
   @SubscribeEvent
   def attachCapaToTile(event: AttachCapabilitiesEvent[TileEntity]): Unit =
@@ -271,8 +269,9 @@ class CommonProxy {
     }
 
     def randomTool(rand: Random) = {
-      val r = new ItemStack(tools(rand.nextInt(tools.size)))
-      RhTool.setXp(r, rand.nextInt(10))
+      val item = tools(rand.nextInt(tools.size))
+      val r = new ItemStack(item)
+      item.setXp(r, rand.nextInt(10))
       r
     }
 
@@ -317,6 +316,35 @@ class CommonProxy {
           }
         case _ =>
       }
+  }
+
+  @SubscribeEvent
+  def registerInfuserRecipesRegistry(event: RegistryEvent.NewRegistry): Unit = {
+    new RegistryBuilder()
+      .setName(new ResourceLocation(Main.modid, "infuser_recipes"))
+      .setType(classOf[InfuserRecipe])
+      .create()
+  }
+
+  @SubscribeEvent
+  def registerInfuserRecipes(event: RegistryEvent.Register[InfuserRecipe]): Unit = {
+    def toolInfusion(item: Item with RhTool): StepInfuserRecipe =
+      StepInfuserRecipe(Ingredient.fromItem(item), 1, item.getMaxDamage)
+
+    event.getRegistry.register(toolInfusion(ItemRhAxe))
+    event.getRegistry.register(toolInfusion(ItemRhPickaxe))
+    event.getRegistry.register(toolInfusion(ItemRhShovel))
+    event.getRegistry.register(toolInfusion(ItemRhSword))
+    event.getRegistry.register(StepInfuserRecipe(Ingredient.fromItem(Item.getItemFromBlock(BlockDarkRhinestonePowder)), 10, 15))
+    event.getRegistry.register(DummyInfuserRecipe(Ingredient.fromStacks(new ItemStack(BlockDarkRhinestonePowder)), new ItemStack(BlockDarkRhinestone), 10))
+    event.getRegistry.register(DummyInfuserRecipe(Ingredient.fromItem(ItemDustBottle), new ItemStack(ItemEmptyBottle), 1))
+    event.getRegistry.register(DummyInfuserRecipe(Ingredient.fromItem(ItemEmptyBottle), new ItemStack(ItemFilledBottle), Configuration.rhinestoneBottleCapacity))
+  }
+
+  @SubscribeEvent
+  def attachCapaToStacks(event: AttachCapabilitiesEvent[ItemStack]): Unit = {
+    if (event.getObject.getItem.isInstanceOf[ItemXPContainer])
+      event.addCapability(new ResourceLocation(Main.modid, "capa_xp_container"), new CapabilityXPContainer(event.getObject))
   }
 
 }

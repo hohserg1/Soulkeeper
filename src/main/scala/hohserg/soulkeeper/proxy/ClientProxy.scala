@@ -68,23 +68,26 @@ class ClientProxy extends CommonProxy {
 
   @SubscribeEvent
   def onToolModelRegister(event: ModelBakeEvent): Unit = {
+    val getModel = event.getModelRegistry.getObject _
+    val setModel = event.getModelRegistry.putObject _
+
     toolModels.foreach {
       case (key, (model, _, _)) =>
-        event.getModelRegistry.putObject(key, model(event.getModelRegistry.getObject(key)))
+        setModel(key, model(getModel(key)))
     }
 
     val bottleKey = new ModelResourceLocation(ItemEmptyBottle.getRegistryName(), "inventory")
     val bottleCorkKey = new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory")
-    val bottleModel = event.getModelRegistry.getObject(bottleKey)
-    val corkModel = event.getModelRegistry.getObject(bottleCorkKey)
-    event.getModelRegistry.putObject(bottleKey, new CombinedModel(corkModel, bottleModel))
+    val bottleModel = getModel(bottleKey)
+    val corkModel = getModel(bottleCorkKey)
+    setModel(bottleKey, new CombinedModel(corkModel, bottleModel))
 
 
     val contentKey = new ModelResourceLocation(ItemFilledBottle.getRegistryName(), "inventory")
-    val contentModel = event.getModelRegistry.getObject(contentKey)
-    val combinedBottleModel = event.getModelRegistry.getObject(bottleKey)
+    val contentModel = getModel(contentKey)
+    val combinedBottleModel = getModel(bottleKey)
 
-    event.getModelRegistry.putObject(contentKey, new BuiltInModel(combinedBottleModel.getItemCameraTransforms, ItemOverrideList.NONE))
+    setModel(contentKey, new BuiltInModel(combinedBottleModel.getItemCameraTransforms, ItemOverrideList.NONE))
 
     val bottleStack = new ItemStack(ItemEmptyBottle)
     ItemFilledBottle.setTileEntityItemStackRenderer(new TileEntityItemStackRenderer {

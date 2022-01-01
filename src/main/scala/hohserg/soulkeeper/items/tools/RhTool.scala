@@ -1,5 +1,6 @@
 package hohserg.soulkeeper.items.tools
 
+import hohserg.soulkeeper.api.ItemXPContainer
 import hohserg.soulkeeper.items.{ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.resources.I18n
@@ -14,17 +15,14 @@ import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.{EnumHand, NonNullList}
 import net.minecraft.world.World
 
-trait RhTool {
+trait RhTool extends ItemXPContainer{
   self: Item =>
+
+  override def getXpCapacity(stack: ItemStack): Int = stack.getMaxDamage
 
   override def showDurabilityBar(stack: ItemStack): Boolean = false
 
-  override def hasEffect(stack: ItemStack): Boolean = RhTool.getXp(stack) >= 7 || stack.isItemEnchanted
-
-
-  override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[String], flagIn: ITooltipFlag): Unit = {
-    tooltip.add(I18n.format("soulkeeper.xp") + " " + RhTool.getXp(stack) + "/" + stack.getMaxDamage)
-  }
+  override def hasEffect(stack: ItemStack): Boolean = getXp(stack) >= 7 || stack.isItemEnchanted
 
   def dustAmount: Int
 
@@ -42,7 +40,7 @@ trait RhTool {
 
   private def onUseItem(stack: ItemStack, entityLiving: EntityLivingBase): Unit =
     if (!entityLiving.world.isRemote) {
-      val cur = RhTool.getXp(stack)
+      val cur = getXp(stack)
       if (cur == 0 && entityLiving.world.rand.nextInt(15) < entityLiving.world.getLight(entityLiving.getPosition)) {
         if (entityLiving.getHeldItemMainhand == stack)
           entityLiving.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.STICK))
@@ -64,7 +62,7 @@ trait RhTool {
       } else {
         val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack)
         if (i == 0 || !EnchantmentDurability.negateDamage(stack, i, entityLiving.world.rand))
-          RhTool.setXp(stack, cur - 1)
+          setXp(stack, cur - 1)
 
         if (!EnchantmentDurability.negateDamage(stack, 3, entityLiving.world.rand))
           stack.setItemDamage(stack.getItemDamage + 1)
@@ -98,18 +96,9 @@ trait RhTool {
     if (tab == getCreativeTab) {
       items.add(new ItemStack(this))
       val stack = new ItemStack(this)
-      RhTool.setXp(stack, stack.getMaxDamage)
+      setXp(stack, getXpCapacity(stack))
       items.add(stack)
     }
 
-
-}
-
-object RhTool {
-  def getXp(stack: ItemStack): Int =
-    stack.getOrCreateSubCompound("toolData").getInteger("xp")
-
-  def setXp(stack: ItemStack, amount: Int): Unit =
-    stack.getOrCreateSubCompound("toolData").setInteger("xp", Math.max(0, Math.min(amount, stack.getMaxDamage)))
 
 }

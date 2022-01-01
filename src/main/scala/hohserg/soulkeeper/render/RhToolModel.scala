@@ -4,6 +4,7 @@ import java.util
 import java.util.Optional
 
 import com.google.common.collect.ImmutableList
+import hohserg.soulkeeper.api.CapabilityXPContainer
 import hohserg.soulkeeper.items.tools.RhTool
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -41,7 +42,7 @@ class RhToolModel(base: IBakedModel, enchantedTextureName: String, emptyTextureN
   override def getOverrides: ItemOverrideList = new ItemOverrideList(ImmutableList.of()) {
     //Minecraft.getMinecraft.getRenderItem.renderItemOverlayIntoGUI()
     override def handleItemState(originalModel: IBakedModel, stack: ItemStack, world: World, entity: EntityLivingBase): IBakedModel = {
-      val xp = RhTool.getXp(stack)
+      val xp = CapabilityXPContainer(stack).getXp
       if (xp > 0)
         enchantedModel
       else
