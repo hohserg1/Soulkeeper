@@ -1,14 +1,18 @@
 package hohserg.soulkeeper.items
 
+import java.util
+
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.items.tools.{RhTool, rhinestone}
 import net.minecraft.advancements.critereon.{ItemDurabilityTrigger, ItemPredicate, MinMaxBounds}
 import net.minecraft.advancements.{CriteriaTriggers, ICriterionTrigger, PlayerAdvancements}
+import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.{ItemShield, ItemStack}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.text.translation.I18n
+import net.minecraft.world.World
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent
@@ -34,6 +38,12 @@ object ItemRhShield extends ItemShield with RhTool {
       onUseItem(stack, player, damage)
       stack.setItemDamage(stack.getItemDamage - damage)
     }
+  }
+
+  override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag): Unit = {
+    super.addInformation(stack, worldIn, tooltip, flagIn)
+    val pattern = stack.getOrCreateSubCompound("shieldData").getString("pattern")
+    tooltip.add("Pattern: " + (if (pattern == "") "soulkeeper" else pattern))
   }
 
   @SubscribeEvent

@@ -16,6 +16,7 @@ class ClientPacketHandler extends IClientPacketHandler {
         entity match {
           case orb: CustomEntityXPOrb =>
             orb.setXpValue(packetCustom.readInt())
+            orb.setAge(packetCustom.readInt())
           case _ =>
         }
       case _ =>

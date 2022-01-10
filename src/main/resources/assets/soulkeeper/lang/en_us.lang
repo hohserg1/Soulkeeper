@@ -20,3 +20,5 @@ item.item_filled_bottle.name=Filled Rhinestone Bottle
 item.item_dust_bottle.name=Rhinestone Bottle Blank
 
 soulkeeper.xp=XP:
+
+effect.xp_leak=XP Leak

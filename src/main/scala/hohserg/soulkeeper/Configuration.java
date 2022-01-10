@@ -52,7 +52,7 @@ public class Configuration {
     @Config.RangeInt(min = 1)
     public static int rhinestoneToolsChestLootRarity = 1000;
 
-    @Config.Comment({"How many xp required for one infuse of Rhinestone Poweder block","Number of infuses is 16"})
+    @Config.Comment({"How many xp required for one infuse of Rhinestone Poweder block", "Number of infuses is 15"})
     @Config.RangeInt(min = 1)
     public static int xpPerRhinestonePowderInfuse = 10;
 
@@ -61,5 +61,14 @@ public class Configuration {
 
     @Config.RangeInt(min = 1)
     public static int rhinestoneOrbCapacity = 20000;
+
+
+    @Config.Comment({"How many xp will be leak every tick when player have XPLeak effect"})
+    @Config.RangeInt(min = 1)
+    public static int xpLeakPerEffectLevel = 1;
+
+    @Config.Comment("Chance to inflict xp leak effect on attack by xp leak enchanted weapon")
+    @Config.RangeDouble(min = 0, max = 1)
+    public static double xpLeakInflictChance = 0.5;
 
 }

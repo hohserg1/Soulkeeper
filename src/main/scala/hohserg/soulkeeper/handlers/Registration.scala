@@ -4,16 +4,20 @@ import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
 import hohserg.soulkeeper.blocks.BlockRhOrb.TileRhOrb
 import hohserg.soulkeeper.blocks._
+import hohserg.soulkeeper.enchantments.EnchantXPLeak
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.items.bottle.{ItemDustBottle, ItemEmptyBottle, ItemFilledBottle}
 import hohserg.soulkeeper.items.tools.{ItemRhAxe, ItemRhPickaxe, ItemRhShovel, ItemRhSword}
 import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhShield, ItemRhinestoneDust, ItemTinyRhinestoneDust}
+import hohserg.soulkeeper.potions.EffectXPLeak
 import net.minecraft.block.Block
 import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
-import net.minecraft.init.Items
+import net.minecraft.init.{Items, PotionTypes}
 import net.minecraft.item.crafting.{IRecipe, Ingredient, ShapedRecipes}
 import net.minecraft.item.{Item, ItemBlock, ItemStack}
+import net.minecraft.potion.{Potion, PotionEffect, PotionHelper, PotionType}
 import net.minecraft.tileentity.BannerPattern
 import net.minecraft.util.{NonNullList, ResourceLocation}
 import net.minecraftforge.event.RegistryEvent
@@ -119,4 +123,60 @@ object Registration {
     )
   }
 
+  @SubscribeEvent
+  def onRegisterPotions(event: RegistryEvent.Register[Potion]): Unit = {
+    event.getRegistry.register(EffectXPLeak)
+  }
+
+  @SubscribeEvent
+  def onRegisterPotionTypes(event: RegistryEvent.Register[PotionType]): Unit = {
+    val normal_1 = new PotionType("xp_leak_1", new PotionEffect(EffectXPLeak, 20 * 10)).setRegistryName("xp_leak_1")
+    val normal_2 = new PotionType("xp_leak_2", new PotionEffect(EffectXPLeak, 20 * 20)).setRegistryName("xp_leak_2")
+    val normal_3 = new PotionType("xp_leak_3", new PotionEffect(EffectXPLeak, 20 * 30)).setRegistryName("xp_leak_3")
+    val normal_4 = new PotionType("xp_leak_4", new PotionEffect(EffectXPLeak, 20 * 40)).setRegistryName("xp_leak_4")
+
+    val strong_1 = new PotionType("xp_leak_strong_1", new PotionEffect(EffectXPLeak, 20 * 5, 1)).setRegistryName("xp_leak_strong_1")
+    val strong_2 = new PotionType("xp_leak_strong_2", new PotionEffect(EffectXPLeak, 20 * 10, 1)).setRegistryName("xp_leak_strong_2")
+    val strong_3 = new PotionType("xp_leak_strong_3", new PotionEffect(EffectXPLeak, 20 * 15, 1)).setRegistryName("xp_leak_strong_3")
+    val strong_4 = new PotionType("xp_leak_strong_4", new PotionEffect(EffectXPLeak, 20 * 20, 1)).setRegistryName("xp_leak_strong_4")
+
+    event.getRegistry.register(normal_1)
+    event.getRegistry.register(normal_2)
+    event.getRegistry.register(normal_3)
+    event.getRegistry.register(normal_4)
+    event.getRegistry.register(strong_1)
+    event.getRegistry.register(strong_2)
+    event.getRegistry.register(strong_3)
+    event.getRegistry.register(strong_4)
+
+    PotionHelper.addMix(PotionTypes.AWKWARD, ItemTinyRhinestoneDust, normal_1)
+    PotionHelper.addMix(PotionTypes.AWKWARD, ItemRhinestoneDust, normal_4)
+    PotionHelper.addMix(normal_1, ItemTinyRhinestoneDust, normal_2)
+    PotionHelper.addMix(normal_2, ItemTinyRhinestoneDust, normal_3)
+    PotionHelper.addMix(normal_3, ItemTinyRhinestoneDust, normal_4)
+
+    PotionHelper.addMix(normal_1, Items.GLOWSTONE_DUST, strong_1)
+    PotionHelper.addMix(normal_2, Items.GLOWSTONE_DUST, strong_2)
+    PotionHelper.addMix(normal_3, Items.GLOWSTONE_DUST, strong_3)
+    PotionHelper.addMix(normal_4, Items.GLOWSTONE_DUST, strong_4)
+
+    PotionHelper.addMix(strong_1, ItemTinyRhinestoneDust, strong_2)
+    PotionHelper.addMix(strong_2, ItemTinyRhinestoneDust, strong_3)
+    PotionHelper.addMix(strong_3, ItemTinyRhinestoneDust, strong_4)
+
+
+    PotionHelper.addMix(strong_1, Items.REDSTONE, normal_2)
+    PotionHelper.addMix(strong_2, Items.REDSTONE, normal_3)
+    PotionHelper.addMix(strong_3, Items.REDSTONE, normal_4)
+  }
+
+  lazy val enchantments = Seq(EnchantXPLeak)
+
+  @SubscribeEvent
+  def onRegisterEnchants(event: RegistryEvent.Register[Enchantment]): Unit = {
+    enchantments.foreach { e =>
+      val name = toId(e.getClass.getSimpleName).init
+      event.getRegistry.register(e.setName(name).setRegistryName(name))
+    }
+  }
 }
