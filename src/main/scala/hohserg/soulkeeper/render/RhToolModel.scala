@@ -40,7 +40,6 @@ class RhToolModel(base: IBakedModel, enchantedTextureName: String, emptyTextureN
   override def getQuads(state: IBlockState, side: EnumFacing, rand: Long): util.List[BakedQuad] = ImmutableList.of()
 
   override def getOverrides: ItemOverrideList = new ItemOverrideList(ImmutableList.of()) {
-    //Minecraft.getMinecraft.getRenderItem.renderItemOverlayIntoGUI()
     override def handleItemState(originalModel: IBakedModel, stack: ItemStack, world: World, entity: EntityLivingBase): IBakedModel = {
       val xp = CapabilityXPContainer(stack).getXp
       if (xp > 0)
