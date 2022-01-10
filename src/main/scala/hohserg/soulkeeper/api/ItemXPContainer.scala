@@ -1,11 +1,6 @@
 package hohserg.soulkeeper.api
 
-import hohserg.soulkeeper.items.tools.RhTool
-import net.minecraft.client.resources.I18n
-import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{Item, ItemStack}
-import net.minecraft.world.World
-import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 trait ItemXPContainer {
   self: Item =>
