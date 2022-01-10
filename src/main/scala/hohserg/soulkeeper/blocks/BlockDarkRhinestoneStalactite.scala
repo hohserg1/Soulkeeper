@@ -15,8 +15,8 @@ import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-@EventBusSubscriber(modid = Main.modid)
 object BlockDarkRhinestoneStalactite extends Block(Material.GLASS) {
   setHardness(0.15f)
   setResistance(0.05f)
@@ -50,15 +50,10 @@ object BlockDarkRhinestoneStalactite extends Block(Material.GLASS) {
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
+  @SideOnly(Side.CLIENT)
   override def getBlockLayer: BlockRenderLayer = BlockRenderLayer.TRANSLUCENT
 
   /* water drip */
   override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit =
     worldIn.spawnParticle(EnumParticleTypes.WATER_DROP, pos.getX, pos.getY, pos.getZ, 0, 0, 0)
-
-  @SubscribeEvent
-  def removeOnTouchOverlay(e: RenderBlockOverlayEvent): Unit = {
-    if (e.getBlockForOverlay.getBlock == this)
-      e.setCanceled(true)
-  }
 }
