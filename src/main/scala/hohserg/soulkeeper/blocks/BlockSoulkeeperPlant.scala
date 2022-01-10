@@ -20,6 +20,8 @@ import net.minecraft.util.{BlockRenderLayer, EnumFacing, EnumHand}
 import net.minecraft.world.{IBlockAccess, World, WorldServer}
 import net.minecraftforge.common.util.FakePlayerFactory
 
+import scala.collection.JavaConverters._
+
 object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
   setSoundType(SoundType.GLASS)
   lightValue = 2
@@ -50,7 +52,7 @@ object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
   }
 
   private def canBlockStayHere(worldIn: World, pos: BlockPos): Boolean =
-    allowedSoil.contains(worldIn.getBlockState(pos.down()).getBlock)
+    allowedSoil.contains(worldIn.getBlockState(pos.down()))
 
   override def canPlaceBlockAt(worldIn: World, pos: BlockPos): Boolean =
     super.canPlaceBlockAt(worldIn, pos) && canBlockStayHere(worldIn, pos)
@@ -59,7 +61,7 @@ object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
     if (!canBlockStayHere(worldIn, pos))
       worldIn.setBlockToAir(pos)
 
-  val allowedSoil = Set(Blocks.STONE, BlockDarkRhinestone)
+  val allowedSoil: Set[IBlockState] = Blocks.STONE.getBlockState.getValidStates.asScala.toSet + BlockDarkRhinestonePowder.withInfuse(15)
 
   /** drop **/
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "soulkeeper:block_dark_rhinestone_powder",
+      "data": 1
+    }
+  ],
+  "result": {
+    "item": "soulkeeper:item_rhinestone_dust",
+    "count": 9
+  }
+}

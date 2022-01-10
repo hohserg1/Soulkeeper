@@ -10,7 +10,9 @@
   },
   "variants": {
     "inventory": [
-      {}
+      {
+        "model": "soulkeeper:item/block_dark_rhinestone_powder"
+      }
     ],
     "infuse": {
       "0": {},
@@ -28,7 +30,12 @@
       "12": {},
       "13": {},
       "14": {},
-      "15": {}
+      "15": {
+        "textures": {
+          "all": "soulkeeper:blocks/block_dark_rhinestone",
+          "particle": "soulkeeper:blocks/block_dark_rhinestone"
+        }
+      }
     }
   }
 }

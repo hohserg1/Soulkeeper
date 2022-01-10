@@ -1,6 +1,6 @@
 package hohserg.soulkeeper.entities
 
-import hohserg.soulkeeper.blocks.{BlockDarkRhinestone, BlockDarkRhinestonePowder}
+import hohserg.soulkeeper.blocks.BlockDarkRhinestonePowder
 import hohserg.soulkeeper.capability.chunk.ExpInChunkProvider
 import hohserg.soulkeeper.network.PacketTypes
 import io.netty.buffer.ByteBuf
@@ -33,7 +33,7 @@ class CustomEntityXPOrb(world: World) extends EntityXPOrb(world) with IEntityAdd
 
     if (!world.isRemote) {
 
-      if (world.getBlockState(underPos).getBlock != BlockDarkRhinestone && world.getBlockState(underPos).getBlock != BlockDarkRhinestonePowder)
+      if (world.getBlockState(underPos).getBlock != BlockDarkRhinestonePowder)
         if (halfOnFallingCooldown == 0) {
           halfOnFallingCooldown = 20 * 10
           halfXPWithChunk()
@@ -46,7 +46,8 @@ class CustomEntityXPOrb(world: World) extends EntityXPOrb(world) with IEntityAdd
   override def onUpdate(): Unit = {
     if (!world.isRemote) {
       if (xpOrbAge >= 6000) {
-        if (world.getBlockState(underPos).getBlock == BlockDarkRhinestone) {
+        val underState = world.getBlockState(underPos)
+        if (underState.getBlock == BlockDarkRhinestonePowder && underState.getValue(BlockDarkRhinestonePowder.infuseProperty) == 15) {
           xpOrbAge = 0
         } else {
           if (xpValue >= 73) {

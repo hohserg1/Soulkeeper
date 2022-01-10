@@ -6,7 +6,8 @@
   ],
   "key": {
     "R": {
-      "item": "soulkeeper:block_dark_rhinestone"
+      "item": "soulkeeper:block_dark_rhinestone_powder",
+      "data": 15
     },
     "O": {
       "item": "minecraft:obsidian"
