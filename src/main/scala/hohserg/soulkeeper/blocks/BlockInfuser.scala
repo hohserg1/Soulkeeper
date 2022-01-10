@@ -1,9 +1,8 @@
 package hohserg.soulkeeper.blocks
 
 import hohserg.soulkeeper.XPUtils
+import hohserg.soulkeeper.api.CapabilityXPContainer
 import hohserg.soulkeeper.api.crafting.{DummyInfuserRecipe, InfuserRecipe, StepInfuserRecipe}
-import hohserg.soulkeeper.api.{CapabilityXPContainer, Registries}
-import hohserg.soulkeeper.utils.ItemStackRepr
 import javax.annotation.Nonnull
 import net.minecraft.block.Block
 import net.minecraft.block.material.{MapColor, Material}
@@ -43,29 +42,6 @@ object BlockInfuser extends Block(Material.ROCK, MapColor.PURPLE) {
     else
       BlockFaceShape.UNDEFINED
 
-  import collection.JavaConverters._
-
-  lazy val recipeMap: Map[ItemStackRepr, InfuserRecipe] = Registries.INFUSER_RECIPES.getValuesCollection.asScala.flatMap {
-    case r: DummyInfuserRecipe =>
-      r.input.getMatchingStacks.map(ItemStackRepr.fromStack).map(_ -> r.asInstanceOf[InfuserRecipe])
-    case r: StepInfuserRecipe =>
-      r.input.getMatchingStacks.flatMap {
-        start =>
-          val capa = CapabilityXPContainer(start)
-          if (capa.getClass == classOf[CapabilityXPContainer.Impl])
-            Set(ItemStackRepr.fromStack(start))
-          else {
-            val startXP = capa.getXp
-            (for (i <- 0 until r.stepAmount) yield {
-              val variant = start.copy()
-              CapabilityXPContainer(variant).setXp(startXP + i * r.stepXP)
-              ItemStackRepr.fromStack(variant)
-            }).toSet
-          }
-      }.map(_ -> r.asInstanceOf[InfuserRecipe])
-    case r =>
-      throw new IllegalStateException("unsupported infuser recipe type: " + r.getClass)
-  }.toMap
 
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (!worldIn.isRemote)
@@ -80,7 +56,7 @@ object BlockInfuser extends Block(Material.ROCK, MapColor.PURPLE) {
 
           if (tile.inv.getStackInSlot(0).isEmpty) {
             val stackInHand = playerIn.getHeldItem(hand)
-            if (recipeMap.contains(ItemStackRepr.fromStack(stackInHand))) {
+            if (InfuserRecipe.findRecipe(stackInHand).isDefined) {
               val input = stackInHand.copy()
               input.setCount(1)
               stackInHand.shrink(1)
@@ -91,8 +67,7 @@ object BlockInfuser extends Block(Material.ROCK, MapColor.PURPLE) {
             if (playerIn.isSneaking)
               ejectItem()
             else {
-              val repr = ItemStackRepr.fromStack(input)
-              val maybeRecipe = recipeMap.get(repr)
+              val maybeRecipe = InfuserRecipe.findRecipe(input)
               maybeRecipe.foreach {
                 case r: DummyInfuserRecipe =>
                   val playerXP = XPUtils.getPlayerXP(playerIn)
