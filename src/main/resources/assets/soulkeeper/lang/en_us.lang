@@ -6,9 +6,10 @@ tile.block_dark_rhinestone_powder.name=Dark Rhinestone Powder
 tile.block_dark_rhinestone_stalactite.name=Rhinestone Stalactite
 tile.block_infuser.name=Experience Infuser
 tile.block_rh_orb.name=Dark Rhinestone Orb
+tile.block_rh_powder_orb.name=Dark Rhinestone Powder Orb
 
-item.item_tiny_rhinestone_dust.name=Tiny Pile of Rhinestone Dust
-item.item_rhinestone_dust.name=Rhinestone Dust
+item.item_tiny_rhinestone_dust.name=Tiny Pile of Dark Rhinestone Dust
+item.item_rhinestone_dust.name=Dark Rhinestone Dust
 item.item_rh_pickaxe.name=Rhinestone Pickaxe
 item.item_rh_axe.name=Rhinestone Axe
 item.item_rh_sword.name=Rhinestone Sword
