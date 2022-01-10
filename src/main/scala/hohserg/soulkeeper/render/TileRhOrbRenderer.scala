@@ -9,21 +9,21 @@ import net.minecraft.client.renderer.{BufferBuilder, GlStateManager, Tessellator
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 
-class TileRhOrbRenderer extends BaseTESR[TileRhOrb] {
+object TileRhOrbRenderer extends BaseTESR[TileRhOrb] {
 
   override def render(te: TileRhOrb, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     drawLabel(te, x, y, z, partialTicks)
-    drawFluidLevel(te, x, y, z, partialTicks)
+    drawFluidLevel(te.xp, x, y, z, partialTicks)
   }
 
   val texture1 = new ResourceLocation(Main.modid, "textures/blocks/rh_orb/fluid1.png")
   val texture2 = new ResourceLocation(Main.modid, "textures/blocks/rh_orb/fluid2.png")
   val texture3 = new ResourceLocation(Main.modid, "textures/blocks/rh_orb/fluid3.png")
 
-  def drawFluidLevel(te: TileRhOrb, x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
-    if (te.xp > 0) {
+  def drawFluidLevel(xp: Int, x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    if (xp > 0) {
       val pixel = 1d / 16
-      val fluidLevel = te.xp.toDouble / Configuration.rhinestoneOrbCapacity
+      val fluidLevel = xp.toDouble / Configuration.rhinestoneOrbCapacity
       val fullHeight = 10
       val startY = 2
       val texture2Y = (4, 10)

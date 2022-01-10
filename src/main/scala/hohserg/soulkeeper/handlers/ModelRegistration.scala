@@ -1,25 +1,24 @@
 package hohserg.soulkeeper.handlers
 
 import hohserg.soulkeeper.Main
-import hohserg.soulkeeper.blocks.BlockDarkRhinestonePowder
+import hohserg.soulkeeper.api.CapabilityXPContainer
+import hohserg.soulkeeper.blocks.{BlockDarkRhinestonePowder, BlockRhOrb}
 import hohserg.soulkeeper.handlers.Registration._
 import hohserg.soulkeeper.items.ItemRhShield
 import hohserg.soulkeeper.items.bottle.{ItemEmptyBottle, ItemFilledBottle}
-import hohserg.soulkeeper.render.{BottleModel, RhShieldRenderer, RhToolModel}
-import javax.vecmath.Matrix4f
+import hohserg.soulkeeper.render._
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.block.model._
+import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.client.renderer.{GlStateManager, RenderHelper}
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.{ModelBakeEvent, ModelRegistryEvent, TextureStitchEvent}
 import net.minecraftforge.client.model.{IModel, ModelLoader}
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.apache.commons.lang3.tuple
-import org.apache.commons.lang3.tuple.Pair
 
 @EventBusSubscriber(modid = Main.modid)
 object ModelRegistration {
@@ -90,12 +89,7 @@ object ModelRegistration {
     val contentModel = getModel(contentKey)
     val combinedBottleModel = getModel(bottleKey)
 
-    setModel(contentKey, new BuiltInModel(combinedBottleModel.getItemCameraTransforms, ItemOverrideList.NONE) {
-      override def handlePerspective(cameraTransformType: ItemCameraTransforms.TransformType): tuple.Pair[_ <: IBakedModel, Matrix4f] = {
-        val matrix4f = combinedBottleModel.handlePerspective(cameraTransformType).getRight
-        Pair.of(this, matrix4f)
-      }
-    })
+    setModel(contentKey, new BuiltinModelDelegate(combinedBottleModel))
 
     val bottleStack = new ItemStack(ItemEmptyBottle)
     ItemFilledBottle.setTileEntityItemStackRenderer(new TileEntityItemStackRenderer {
@@ -111,6 +105,28 @@ object ModelRegistration {
     wrapModel(new ModelResourceLocation(ItemRhShield.getRegistryName, "inventory"), new RhShieldRenderer.ShieldBakedModel(_))
     wrapModel(new ModelResourceLocation(new ResourceLocation(Main.modid, "item/item_rh_shield_blocking"), "inventory"), new RhShieldRenderer.ShieldBakedModel(_))
     ItemRhShield.setTileEntityItemStackRenderer(RhShieldRenderer)
+
+    val orbModelKey = new ModelResourceLocation(BlockRhOrb.getRegistryName, "inventory")
+    val orbModel = getModel(orbModelKey)
+    setModel(orbModelKey, new BuiltinModelDelegate(orbModel))
+    Item.getItemFromBlock(BlockRhOrb).setTileEntityItemStackRenderer(new TileEntityItemStackRenderer {
+      override def renderByItem(stack: ItemStack, partialTicks: Float): Unit = {
+        GlStateManager.enableAlpha()
+        GlStateManager.enableBlend()
+
+        GlStateManager.pushMatrix()
+
+        RenderHelper.enableGUIStandardItemLighting()
+        TileRhOrbRenderer.drawFluidLevel(CapabilityXPContainer(stack).getXp, 0, 0, 0, partialTicks)
+
+        GlStateManager.translate(0.5, 0.5, 0.5)
+        RenderHelper.enableStandardItemLighting()
+        Minecraft.getMinecraft.getTextureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE)
+        Minecraft.getMinecraft.getRenderItem.renderItem(stack, orbModel)
+
+        GlStateManager.popMatrix()
+      }
+    })
   }
 
 

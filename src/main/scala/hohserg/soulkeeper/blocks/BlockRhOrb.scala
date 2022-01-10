@@ -1,24 +1,28 @@
 package hohserg.soulkeeper.blocks
 
 import hohserg.soulkeeper.api.{Capabilities, CapabilityXPContainer}
-import hohserg.soulkeeper.blocks.BlockDarkRhinestonePowder.{setHarvestLevel, withInfuse}
-import hohserg.soulkeeper.{Configuration, XPUtils}
+import hohserg.soulkeeper.{Configuration, Main, XPUtils}
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, SoundType}
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
-import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand}
+import net.minecraft.util._
+import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult}
 import net.minecraft.world.{IBlockAccess, World, WorldServer}
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+@EventBusSubscriber(modid = Main.modid)
 object BlockRhOrb extends Block(Material.GLASS) with RhColor {
   setHardness(1)
   setResistance(10)
@@ -63,6 +67,51 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor {
       }
     }
     true
+  }
+
+  @SubscribeEvent
+  def attachCapaToItem(event: AttachCapabilitiesEvent[ItemStack]): Unit = {
+    val stack = event.getObject
+    if (Item.getItemFromBlock(this) != Items.AIR && stack.getItem == Item.getItemFromBlock(this)) {
+      event.addCapability(new ResourceLocation(Main.modid, "capa_xp_container"), new CapabilityXPContainer {
+        override def getXp: Int = stack.getOrCreateSubCompound("xp_container").getInteger("xp")
+
+        override def setXp(amount: Int): Unit = stack.getOrCreateSubCompound("xp_container").setInteger("xp", Math.max(0, Math.min(amount, getXpCapacity)))
+
+        override def getXpCapacity: Int = Configuration.rhinestoneOrbCapacity
+      })
+    }
+  }
+
+  def getItemStack(world: IBlockAccess, pos: BlockPos): ItemStack = {
+    val r = new ItemStack(this)
+    world.getTileEntity(pos) match {
+      case tile: TileRhOrb =>
+        CapabilityXPContainer(r).setXp(tile.xp)
+      case _ =>
+        println("te miss")
+    }
+    r
+  }
+
+  override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
+    Block.spawnAsEntity(worldIn, pos, getItemStack(worldIn, pos))
+
+    super.breakBlock(worldIn, pos, state)
+  }
+
+  override def getDrops(drops: NonNullList[ItemStack], world: IBlockAccess, pos: BlockPos, state: IBlockState, fortune: Int): Unit = {
+  }
+
+  override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack =
+    getItemStack(world, pos)
+
+  override def onBlockPlacedBy(world: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+    world.getTileEntity(pos) match {
+      case tile: TileRhOrb =>
+        tile.xp = CapabilityXPContainer(stack).getXp
+      case _ =>
+    }
   }
 
   class TileRhOrb extends TileEntity {

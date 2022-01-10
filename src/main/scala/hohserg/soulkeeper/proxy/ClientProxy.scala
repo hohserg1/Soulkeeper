@@ -31,7 +31,7 @@ class ClientProxy extends CommonProxy {
     Minecraft.getMinecraft.renderItem = new RenderItemWithCustomOverlay(Minecraft.getMinecraft.renderItem)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileInfuser], new TileInfuserRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileRhOrb], new TileRhOrbRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileRhOrb], TileRhOrbRenderer)
   }
 
   override def postInit(event: FMLPostInitializationEvent): Unit = {
