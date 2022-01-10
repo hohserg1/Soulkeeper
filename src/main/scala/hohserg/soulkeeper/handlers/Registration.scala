@@ -28,13 +28,12 @@ object Registration {
   lazy val blocks = Seq(BlockDarkRhinestone, BlockSoulkeeperPlant, BlockDarkRhinestonePowder, BlockDarkRhinestoneStalactite, BlockInfuser)
   lazy val tools = Seq(ItemRhPickaxe, ItemRhAxe, ItemRhShovel, ItemRhSword)
   lazy val items =
-    Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemDustBottle, ItemEmptyBottle, ItemFilledBottle) ++
+    Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemDustBottle, ItemEmptyBottle, ItemFilledBottle, ItemRhShield) ++
       blocks.map {
         case b: ItemBlockProvider => b.getItemBlock
         case b => new ItemBlock(b)
       } ++
-      tools ++
-      Seq(ItemEmptyBottleCork)
+      tools
 
 
   def toId(r: String): String = {

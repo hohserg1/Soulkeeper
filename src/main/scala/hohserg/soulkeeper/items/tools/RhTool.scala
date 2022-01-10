@@ -3,8 +3,6 @@ package hohserg.soulkeeper.items.tools
 import hohserg.soulkeeper.api.ItemXPContainer
 import hohserg.soulkeeper.items.{ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.resources.I18n
-import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.enchantment.{EnchantmentDurability, EnchantmentHelper}
 import net.minecraft.entity.EntityLivingBase
@@ -15,7 +13,7 @@ import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.{EnumHand, NonNullList}
 import net.minecraft.world.World
 
-trait RhTool extends ItemXPContainer{
+trait RhTool extends ItemXPContainer {
   self: Item =>
 
   override def getXpCapacity(stack: ItemStack): Int = stack.getMaxDamage
@@ -27,18 +25,18 @@ trait RhTool extends ItemXPContainer{
   def dustAmount: Int
 
   override def onBlockDestroyed(stack: ItemStack, worldIn: World, state: IBlockState, pos: BlockPos, entityLiving: EntityLivingBase): Boolean = {
-    onUseItem(stack, entityLiving)
+    onUseItem(stack, entityLiving, 1)
 
     true
   }
 
   override def hitEntity(stack: ItemStack, target: EntityLivingBase, attacker: EntityLivingBase): Boolean = {
-    onUseItem(stack, attacker)
+    onUseItem(stack, attacker, 1)
 
     true
   }
 
-  private def onUseItem(stack: ItemStack, entityLiving: EntityLivingBase): Unit =
+  protected def onUseItem(stack: ItemStack, entityLiving: EntityLivingBase, damage: Int): Unit =
     if (!entityLiving.world.isRemote) {
       val cur = getXp(stack)
       if (cur == 0 && entityLiving.world.rand.nextInt(15) < entityLiving.world.getLight(entityLiving.getPosition)) {
@@ -62,10 +60,10 @@ trait RhTool extends ItemXPContainer{
       } else {
         val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack)
         if (i == 0 || !EnchantmentDurability.negateDamage(stack, i, entityLiving.world.rand))
-          setXp(stack, cur - 1)
+          setXp(stack, cur - damage)
 
         if (!EnchantmentDurability.negateDamage(stack, 3, entityLiving.world.rand))
-          stack.setItemDamage(stack.getItemDamage + 1)
+          stack.setItemDamage(stack.getItemDamage + damage)
       }
     }
 

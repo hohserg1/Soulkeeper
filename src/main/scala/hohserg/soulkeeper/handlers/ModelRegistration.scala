@@ -3,17 +3,19 @@ package hohserg.soulkeeper.handlers
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.blocks.BlockDarkRhinestonePowder
 import hohserg.soulkeeper.handlers.Registration._
+import hohserg.soulkeeper.items.ItemRhShield
 import hohserg.soulkeeper.items.bottle.{ItemEmptyBottle, ItemFilledBottle}
-import hohserg.soulkeeper.render.{BottleModel, RhToolModel}
+import hohserg.soulkeeper.render.{BottleModel, RhShieldRenderer, RhToolModel}
 import javax.vecmath.Matrix4f
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.block.model._
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.{ModelBakeEvent, ModelRegistryEvent, TextureStitchEvent}
-import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.client.model.{IModel, ModelLoader}
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.tuple
@@ -27,9 +29,21 @@ object ModelRegistration {
     items.foreach(i => ModelLoader.setCustomModelResourceLocation(i, 0, new ModelResourceLocation(i.getRegistryName(), "inventory")))
 
     val powderItemBlock = Item.getItemFromBlock(BlockDarkRhinestonePowder)
-    for (i <- 1 to 14)
+    for (i <- 1 to 15)
       ModelLoader.setCustomModelResourceLocation(powderItemBlock, i, new ModelResourceLocation(powderItemBlock.getRegistryName(), "inventory"))
   }
+
+  val loadModel: ResourceLocation => IModel = {
+    val VanillaLoaderClass = classOf[net.minecraftforge.client.model.ModelLoader].getDeclaredClasses.filter(cl => cl.getSimpleName == "VanillaLoader").head
+    val instanceField = VanillaLoaderClass.getDeclaredField("INSTANCE")
+    instanceField.setAccessible(true)
+    val instance = instanceField.get(null)
+    val loadModel = VanillaLoaderClass.getDeclaredMethod("loadModel", classOf[ResourceLocation])
+    loadModel.setAccessible(true)
+    loadModel.invoke(instance, _).asInstanceOf[IModel]
+  }
+
+  def bakeModel(model: IModel): IBakedModel = model.bake(model.getDefaultState, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter())
 
   lazy val toolModels =
     tools.map {
@@ -42,10 +56,25 @@ object ModelRegistration {
         key -> (new RhToolModel(_: IBakedModel, enchantedTextureName, emptyTextureName), enchantedTextureName, emptyTextureName)
     }
 
+  lazy val shieldEnchantedModel = loadModel(new ResourceLocation(Main.modid, "models/item/shield_enchanted"))
+  lazy val shieldHandleModel = loadModel(new ResourceLocation(Main.modid, "models/item/shield_handle"))
+  lazy val shieldEmptyModel = loadModel(new ResourceLocation(Main.modid, "models/item/shield_empty"))
+
+  lazy val shieldEnchantedBakedModel = bakeModel(shieldEnchantedModel)
+  lazy val shieldHandleBakedModel = bakeModel(shieldHandleModel)
+  lazy val shieldEmptyBakedModel = bakeModel(shieldEmptyModel)
+
+  lazy val bottleCorkModel = loadModel(new ResourceLocation(Main.modid, "models/item/item_empty_bottle_cork"))
+  lazy val bottleCorkBakedModel = bakeModel(bottleCorkModel)
+
   @SubscribeEvent
   def onToolModelRegister(event: ModelBakeEvent): Unit = {
     val getModel = event.getModelRegistry.getObject _
     val setModel = event.getModelRegistry.putObject _
+
+    def wrapModel(key: ModelResourceLocation, wrapper: IBakedModel => IBakedModel): Unit =
+      setModel(key, wrapper(getModel(key)))
+
 
     toolModels.foreach {
       case (key, (model, _, _)) =>
@@ -53,10 +82,8 @@ object ModelRegistration {
     }
 
     val bottleKey = new ModelResourceLocation(ItemEmptyBottle.getRegistryName(), "inventory")
-    val bottleCorkKey = new ModelResourceLocation(new ResourceLocation(Main.modid, "item_empty_bottle_cork"), "inventory")
     val bottleModel = getModel(bottleKey)
-    val corkModel = getModel(bottleCorkKey)
-    setModel(bottleKey, new BottleModel(corkModel, bottleModel))
+    setModel(bottleKey, new BottleModel(bottleCorkBakedModel, bottleModel))
 
 
     val contentKey = new ModelResourceLocation(ItemFilledBottle.getRegistryName(), "inventory")
@@ -80,15 +107,32 @@ object ModelRegistration {
         GlStateManager.popMatrix()
       }
     })
+
+    wrapModel(new ModelResourceLocation(ItemRhShield.getRegistryName, "inventory"), new RhShieldRenderer.ShieldBakedModel(_))
+    wrapModel(new ModelResourceLocation(new ResourceLocation(Main.modid, "item/item_rh_shield_blocking"), "inventory"), new RhShieldRenderer.ShieldBakedModel(_))
+    ItemRhShield.setTileEntityItemStackRenderer(RhShieldRenderer)
   }
 
+
+  import collection.JavaConverters._
+
+
   @SubscribeEvent
-  def registerTextures(event: TextureStitchEvent): Unit = {
+  def registerTextures(event: TextureStitchEvent.Pre): Unit = {
     toolModels.foreach {
       case (_, (_, enchantedTextureName, emptyTextureName)) =>
         event.getMap.registerSprite(new ResourceLocation(enchantedTextureName))
         event.getMap.registerSprite(new ResourceLocation(emptyTextureName))
     }
+
+    Seq(
+      shieldEnchantedModel,
+      shieldHandleModel,
+      shieldEmptyModel,
+      bottleCorkModel
+    ).foreach(_.getTextures.asScala.foreach(event.getMap.registerSprite))
+
+    RhShieldRenderer.preparedShieldPatternTextures(event.getMap)
   }
 
 }

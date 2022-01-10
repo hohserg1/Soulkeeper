@@ -1,0 +1,21 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "soulkeeper:items/item_rh_shield_enchanted",
+		"particle": "soulkeeper:items/item_rh_shield_enchanted"
+	},
+	"elements": [
+		{
+			"from": [-1, -3, -5.001],
+			"to": [1, 3, 0.999],
+			"faces": {
+				"north": {"uv": [8, 1.5, 8.5, 3], "texture": "#0"},
+				"east": {"uv": [6.5, 1.5, 8, 3], "texture": "#0"},
+				"south": {"uv": [10, 1.5, 10.5, 3], "texture": "#0"},
+				"west": {"uv": [6.5, 1.5, 8, 3], "texture": "#0"},
+				"up": {"uv": [8, 0, 8.5, 1.5], "texture": "#0"},
+				"down": {"uv": [8.5, 0, 9, 1.5], "texture": "#0"}
+			}
+		}
+	]
+}

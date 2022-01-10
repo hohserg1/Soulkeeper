@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "r r",
+    "rir",
+    " r "
+  ],
+  "key": {
+    "r": {
+      "item": "soulkeeper:item_rhinestone_dust"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "soulkeeper:item_rh_shield",
+    "count": 1
+  }
+}
