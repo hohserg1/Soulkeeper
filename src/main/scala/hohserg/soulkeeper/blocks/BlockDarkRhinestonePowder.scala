@@ -11,6 +11,7 @@ import net.minecraft.block.{Block, BlockFalling, SoundType}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.entity.{Entity, EntityLivingBase}
+import net.minecraft.init.Items
 import net.minecraft.item.{IItemPropertyGetter, Item, ItemBlock, ItemStack}
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
 import net.minecraft.util.{NonNullList, ResourceLocation}
@@ -110,7 +111,7 @@ object BlockDarkRhinestonePowder extends BlockFalling(Material.SAND) with ItemBl
   @SubscribeEvent
   def attachCapaToItem(event: AttachCapabilitiesEvent[ItemStack]): Unit = {
     val stack = event.getObject
-    if (stack.getItem == Item.getItemFromBlock(this)) {
+    if (Item.getItemFromBlock(this) != Items.AIR && stack.getItem == Item.getItemFromBlock(this)) {
       event.addCapability(new ResourceLocation(Main.modid, "capa_xp_container"), new CapabilityXPContainer {
         override def getXp: Int = stack.getItemDamage * xpPerRhinestonePowderInfuse
 
