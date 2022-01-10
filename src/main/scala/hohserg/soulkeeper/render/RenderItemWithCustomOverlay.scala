@@ -14,6 +14,7 @@ import net.minecraft.world.World
 
 class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItem(getMinecraft.getTextureManager, getMinecraft.modelManager, getMinecraft.itemColors) {
 
+
   private def renderSpecialBar(stack: ItemStack, xPosition: Int, yPosition: Int) = {
     stack.getItem match {
       case tool: RhTool =>
@@ -29,10 +30,11 @@ class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItem(getMinecr
 
         val barSize: Int = 13
 
-        def barProgress(v: Int): Int =
-          (v.toFloat / max * barSize).round
+        def barProgress(v: Int): Double =
+          v.toFloat / max * barSize
 
         val p1 = barProgress(xp)
+        //println(xp, p1)
         val p2 = barProgress(durability)
 
         drawRect(xPosition + 2, yPosition + 12.5, 13, 3, 0, 0, 0, 255)
@@ -60,7 +62,7 @@ class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItem(getMinecr
     base.renderItemOverlays(fr, stack, xPosition, yPosition)
   }
 
-  private def drawRect(x: Int, y: Double, width: Int, height: Double, red: Int, green: Int, blue: Int, alpha: Int): Unit = {
+  private def drawRect(x: Int, y: Double, width: Double, height: Double, red: Int, green: Int, blue: Int, alpha: Int): Unit = {
     val renderer: BufferBuilder = Tessellator.getInstance.getBuffer
     renderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
     renderer.pos((x + 0).toDouble, (y + 0).toDouble, 0.0D).color(red, green, blue, alpha).endVertex()
