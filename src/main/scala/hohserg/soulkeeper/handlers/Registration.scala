@@ -2,17 +2,20 @@ package hohserg.soulkeeper.handlers
 
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
+import hohserg.soulkeeper.blocks.BlockRhOrb.TileRhOrb
 import hohserg.soulkeeper.blocks._
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.items.bottle.{ItemDustBottle, ItemEmptyBottle, ItemFilledBottle}
-import hohserg.soulkeeper.items.fake.ItemEmptyBottleCork
 import hohserg.soulkeeper.items.tools.{ItemRhAxe, ItemRhPickaxe, ItemRhShovel, ItemRhSword}
-import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhinestoneDust, ItemTinyRhinestoneDust}
+import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhShield, ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import net.minecraft.block.Block
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.Entity
+import net.minecraft.init.Items
+import net.minecraft.item.crafting.{IRecipe, Ingredient, ShapedRecipes}
 import net.minecraft.item.{Item, ItemBlock, ItemStack}
-import net.minecraft.util.ResourceLocation
+import net.minecraft.tileentity.BannerPattern
+import net.minecraft.util.{NonNullList, ResourceLocation}
 import net.minecraftforge.event.RegistryEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,7 +28,7 @@ object Registration {
     override def getTabIconItem: ItemStack = new ItemStack(BlockSoulkeeperPlant)
   }
 
-  lazy val blocks = Seq(BlockDarkRhinestone, BlockSoulkeeperPlant, BlockDarkRhinestonePowder, BlockDarkRhinestoneStalactite, BlockInfuser)
+  lazy val blocks = Seq(BlockSoulkeeperPlant, BlockDarkRhinestonePowder, BlockDarkRhinestoneStalactite, BlockInfuser, BlockRhOrb, BlockRhPowderOrb)
   lazy val tools = Seq(ItemRhPickaxe, ItemRhAxe, ItemRhShovel, ItemRhSword)
   lazy val items =
     Seq(ItemTinyRhinestoneDust, ItemRhinestoneDust, ItemDebugXPMeter, ItemDustBottle, ItemEmptyBottle, ItemFilledBottle, ItemRhShield) ++
@@ -52,6 +55,7 @@ object Registration {
     blocks.foreach(register)
 
     GameRegistry.registerTileEntity(classOf[TileInfuser], new ResourceLocation(Main.modid, classOf[TileInfuser].getSimpleName.toLowerCase))
+    GameRegistry.registerTileEntity(classOf[TileRhOrb], new ResourceLocation(Main.modid, classOf[TileRhOrb].getSimpleName.toLowerCase))
   }
 
   @SubscribeEvent
@@ -88,6 +92,31 @@ object Registration {
     }
 
     event.getRegistry.register(createEntityEntry(classOf[CustomEntityXPOrb], 160, 20, sendVelocityUpdate = true))
+  }
+
+  @SubscribeEvent
+  def onRegisterRecipes(event: RegistryEvent.Register[IRecipe]): Unit = {
+    event.getRegistry.registerAll(
+      BannerPattern.values()
+        .filter(pattern => pattern.hasPatternItem)
+        .map(pattern => new ShapedRecipes(ItemRhShield.getRegistryName.toString, 3, 3, {
+          val r = Ingredient.fromItem(ItemRhinestoneDust)
+          val i = Ingredient.fromItem(Items.IRON_INGOT)
+          val e = Ingredient.EMPTY
+          val c = Ingredient.fromStacks(pattern.getPatternItem)
+
+          NonNullList.from(e,
+            r, c, r,
+            r, i, r,
+            e, r, e
+          )
+        }, {
+          val result = new ItemStack(ItemRhShield)
+          result.getOrCreateSubCompound("shieldData").setString("pattern", pattern.getFileName)
+          result
+        }).setRegistryName(ItemRhShield.getRegistryName.getResourcePath + pattern.getFileName))
+        : _*
+    )
   }
 
 }

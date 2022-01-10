@@ -3,6 +3,7 @@ package hohserg.soulkeeper.proxy
 import codechicken.lib.packet.PacketCustom
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
+import hohserg.soulkeeper.blocks.BlockRhOrb.TileRhOrb
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.network.ClientPacketHandler
 import hohserg.soulkeeper.render._
@@ -30,6 +31,7 @@ class ClientProxy extends CommonProxy {
     Minecraft.getMinecraft.renderItem = new RenderItemWithCustomOverlay(Minecraft.getMinecraft.renderItem)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileInfuser], new TileInfuserRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileRhOrb], new TileRhOrbRenderer)
   }
 
   override def postInit(event: FMLPostInitializationEvent): Unit = {
