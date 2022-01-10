@@ -1,0 +1,18 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "soulkeeper:block_rh_orb",
+    "textures": {
+      "0": "soulkeeper:blocks/rh_orb/rh_powder_orb",
+      "particle": "soulkeeper:blocks/rh_orb/rh_powder_orb"
+    }
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ]
+  }
+}

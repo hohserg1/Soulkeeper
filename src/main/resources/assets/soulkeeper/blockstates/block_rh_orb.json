@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "normal": { "model": "soulkeeper:block_rh_orb" },
+    "inventory": { "model": "soulkeeper:block_rh_orb" }
+  }
+}
