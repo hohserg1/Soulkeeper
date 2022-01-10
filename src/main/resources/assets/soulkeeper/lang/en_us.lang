@@ -5,6 +5,7 @@ tile.block_dark_rhinestone.name=Block of Dark Rhinestone
 tile.block_dark_rhinestone_powder.name=Dark Rhinestone Powder
 tile.block_dark_rhinestone_stalactite.name=Rhinestone Stalactite
 tile.block_infuser.name=Experience Infuser
+tile.block_rh_orb.name=Dark Rhinestone Orb
 
 item.item_tiny_rhinestone_dust.name=Tiny Pile of Rhinestone Dust
 item.item_rhinestone_dust.name=Rhinestone Dust
@@ -12,5 +13,9 @@ item.item_rh_pickaxe.name=Rhinestone Pickaxe
 item.item_rh_axe.name=Rhinestone Axe
 item.item_rh_sword.name=Rhinestone Sword
 item.item_rh_shovel.name=Rhinestone Shovel
+item.item_rh_shield.name=Rhinestone Shield
+item.item_empty_bottle.name=Empty Rhinestone Bottle
+item.item_filled_bottle.name=Filled Rhinestone Bottle
+item.item_dust_bottle.name=Rhinestone Bottle Blank
 
 soulkeeper.xp=XP:

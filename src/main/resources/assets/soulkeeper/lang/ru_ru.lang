@@ -5,6 +5,7 @@ tile.block_dark_rhinestone.name=Блок темного хрусталя
 tile.block_dark_rhinestone_powder.name=Блок хрустальной пыли
 tile.block_dark_rhinestone_stalactite.name=Хрустальный сталактит
 tile.block_infuser.name=Наполнитель опытом
+tile.block_rh_orb.name=Сфера темного хрусталя
 
 item.item_tiny_rhinestone_dust.name=Маленькая кучка хрустальной пыли
 item.item_rhinestone_dust.name=Хрустальная пыль
@@ -12,5 +13,9 @@ item.item_rh_pickaxe.name=Хрустальная кирка
 item.item_rh_axe.name=Хрустальный топор
 item.item_rh_sword.name=Хрустальный меч
 item.item_rh_shovel.name=Хрустальная лопата
+item.item_rh_shield.name=Хрустальный Щит
+item.item_empty_bottle.name=Пустая хрустальная бутылка
+item.item_filled_bottle.name=Заполненная хрустальная бутылка
+item.item_dust_bottle.name=Заготовка хрустальной бутылки
 
 soulkeeper.xp=Опыт:
