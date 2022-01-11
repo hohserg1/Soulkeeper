@@ -8,8 +8,7 @@ import net.minecraft.item.ItemStack
 
 class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItemDelegate(base) {
 
-
-  private def renderSpecialBar(stack: ItemStack, xPosition: Int, yPosition: Int) = {
+  private def renderSpecialBar(stack: ItemStack, xPosition: Int, yPosition: Int): Unit = {
     stack.getItem match {
       case tool: RhTool =>
         GlStateManager.disableLighting()
