@@ -3,13 +3,15 @@ package hohserg.soulkeeper.render
 import java.util
 
 import hohserg.soulkeeper.items.tools.RhTool
+import net.minecraft.block.Block
 import net.minecraft.client.Minecraft.getMinecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer._
 import net.minecraft.client.renderer.block.model.{BakedQuad, IBakedModel, ItemCameraTransforms}
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.client.resources.IResourceManager
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.item.ItemStack
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.world.World
 
 class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItem(getMinecraft.getTextureManager, getMinecraft.modelManager, getMinecraft.itemColors) {
@@ -101,4 +103,19 @@ class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItem(getMinecr
 
   override def renderItemAndEffectIntoGUI(stack: ItemStack, xPosition: Int, yPosition: Int): Unit =
     base.renderItemAndEffectIntoGUI(stack, xPosition, yPosition)
+
+  override def onResourceManagerReload(resourceManager: IResourceManager): Unit =
+    base.onResourceManagerReload(resourceManager)
+
+  override def registerBlock(blk: Block, subType: Int, identifier: String): Unit =
+    base.registerBlock(blk, subType, identifier)
+
+  override def registerItem(itm: Item, subType: Int, identifier: String): Unit =
+    base.registerItem(itm, subType, identifier)
+
+  override def renderItemModel(stack: ItemStack, bakedmodel: IBakedModel, transform: ItemCameraTransforms.TransformType, leftHanded: Boolean): Unit =
+    base.renderItemModel(stack, bakedmodel, transform, leftHanded)
+
+  override def renderItemModelIntoGUI(stack: ItemStack, x: Int, y: Int, bakedmodel: IBakedModel): Unit =
+    base.renderItemModelIntoGUI(stack, x, y, bakedmodel)
 }
