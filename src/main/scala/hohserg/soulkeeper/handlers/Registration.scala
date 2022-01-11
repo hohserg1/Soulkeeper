@@ -130,44 +130,19 @@ object Registration {
 
   @SubscribeEvent
   def onRegisterPotionTypes(event: RegistryEvent.Register[PotionType]): Unit = {
-    val normal_1 = new PotionType("xp_leak_1", new PotionEffect(EffectXPLeak, 20 * 10)).setRegistryName("xp_leak_1")
-    val normal_2 = new PotionType("xp_leak_2", new PotionEffect(EffectXPLeak, 20 * 20)).setRegistryName("xp_leak_2")
-    val normal_3 = new PotionType("xp_leak_3", new PotionEffect(EffectXPLeak, 20 * 30)).setRegistryName("xp_leak_3")
-    val normal_4 = new PotionType("xp_leak_4", new PotionEffect(EffectXPLeak, 20 * 40)).setRegistryName("xp_leak_4")
+    val normal = new PotionType("xp_leak_normal", new PotionEffect(EffectXPLeak, 20 * 30, 1)).setRegistryName("xp_leak_normal")
+    val long = new PotionType("xp_leak_long", new PotionEffect(EffectXPLeak, 20 * 70)).setRegistryName("xp_leak_long")
+    val strong = new PotionType("xp_leak_strong", new PotionEffect(EffectXPLeak, 20 * 25, 2)).setRegistryName("xp_leak_strong")
 
-    val strong_1 = new PotionType("xp_leak_strong_1", new PotionEffect(EffectXPLeak, 20 * 5, 1)).setRegistryName("xp_leak_strong_1")
-    val strong_2 = new PotionType("xp_leak_strong_2", new PotionEffect(EffectXPLeak, 20 * 10, 1)).setRegistryName("xp_leak_strong_2")
-    val strong_3 = new PotionType("xp_leak_strong_3", new PotionEffect(EffectXPLeak, 20 * 15, 1)).setRegistryName("xp_leak_strong_3")
-    val strong_4 = new PotionType("xp_leak_strong_4", new PotionEffect(EffectXPLeak, 20 * 20, 1)).setRegistryName("xp_leak_strong_4")
+    event.getRegistry.register(normal)
+    event.getRegistry.register(long)
+    event.getRegistry.register(strong)
 
-    event.getRegistry.register(normal_1)
-    event.getRegistry.register(normal_2)
-    event.getRegistry.register(normal_3)
-    event.getRegistry.register(normal_4)
-    event.getRegistry.register(strong_1)
-    event.getRegistry.register(strong_2)
-    event.getRegistry.register(strong_3)
-    event.getRegistry.register(strong_4)
-
-    PotionHelper.addMix(PotionTypes.AWKWARD, ItemTinyRhinestoneDust, normal_1)
-    PotionHelper.addMix(PotionTypes.AWKWARD, ItemRhinestoneDust, normal_4)
-    PotionHelper.addMix(normal_1, ItemTinyRhinestoneDust, normal_2)
-    PotionHelper.addMix(normal_2, ItemTinyRhinestoneDust, normal_3)
-    PotionHelper.addMix(normal_3, ItemTinyRhinestoneDust, normal_4)
-
-    PotionHelper.addMix(normal_1, Items.GLOWSTONE_DUST, strong_1)
-    PotionHelper.addMix(normal_2, Items.GLOWSTONE_DUST, strong_2)
-    PotionHelper.addMix(normal_3, Items.GLOWSTONE_DUST, strong_3)
-    PotionHelper.addMix(normal_4, Items.GLOWSTONE_DUST, strong_4)
-
-    PotionHelper.addMix(strong_1, ItemTinyRhinestoneDust, strong_2)
-    PotionHelper.addMix(strong_2, ItemTinyRhinestoneDust, strong_3)
-    PotionHelper.addMix(strong_3, ItemTinyRhinestoneDust, strong_4)
-
-
-    PotionHelper.addMix(strong_1, Items.REDSTONE, normal_2)
-    PotionHelper.addMix(strong_2, Items.REDSTONE, normal_3)
-    PotionHelper.addMix(strong_3, Items.REDSTONE, normal_4)
+    PotionHelper.addMix(PotionTypes.AWKWARD, ItemRhinestoneDust, normal)
+    PotionHelper.addMix(normal, Items.GLOWSTONE_DUST, strong)
+    PotionHelper.addMix(normal, Items.REDSTONE, long)
+    PotionHelper.addMix(strong, Items.REDSTONE, long)
+    PotionHelper.addMix(long, Items.GLOWSTONE_DUST, strong)
   }
 
   lazy val enchantments = Seq(EnchantXPLeak)
