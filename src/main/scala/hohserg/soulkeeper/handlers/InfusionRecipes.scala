@@ -38,8 +38,8 @@ object InfusionRecipes {
     event.getRegistry.register(toolInfusion(ItemRhSword))
     event.getRegistry.register(toolInfusion(ItemRhShield))
     event.getRegistry.register(StepInfuserRecipe(BlockDarkRhinestonePowder, 10, 15).setRegistryName("powder_infusion"))
-    event.getRegistry.register(DummyInfuserRecipe(ItemDustBottle, new ItemStack(ItemEmptyBottle), 1).setRegistryName("bottle_infusion"))
-    event.getRegistry.register(DummyInfuserRecipe(BlockRhPowderOrb, new ItemStack(BlockRhOrb), 50).setRegistryName("bottle_infusion"))
+    event.getRegistry.register(DummyInfuserRecipe(ItemDustBottle, new ItemStack(ItemEmptyBottle), 1).setRegistryName("bottle_infusion_1"))
+    event.getRegistry.register(DummyInfuserRecipe(BlockRhPowderOrb, new ItemStack(BlockRhOrb), 50).setRegistryName("bottle_infusion_2"))
     event.getRegistry.register(DummyInfuserRecipe(ItemEmptyBottle, new ItemStack(ItemFilledBottle), Configuration.rhinestoneBottleCapacity).setRegistryName("bottle_filling"))
   }
 
