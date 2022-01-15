@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.api.CapabilityXPContainer
 import hohserg.soulkeeper.handlers.ModelRegistration
+import hohserg.soulkeeper.utils.LambdaUtils
 import hohserg.soulkeeper.utils.color.RGBA
 import javax.vecmath.Matrix4f
 import net.minecraft.block.state.IBlockState
@@ -72,15 +73,7 @@ object RhShieldRenderer extends TileEntityItemStackRenderer {
         //.addTexture(new TextureDataHolder(resultImage2))
       }
 
-  def memoize[A, B](f: A => B): A => B = {
-    val cache = new java.util.HashMap[A, B]()
-    val javaFunctionWrapper = new function.Function[A, B] {
-      override def apply(t: A): B = f(t)
-    }
-    cache.computeIfAbsent(_, javaFunctionWrapper)
-  }
-
-  val getDisignModel: String => IBakedModel = memoize((pattern: String) => {
+  val getDisignModel: String => IBakedModel = LambdaUtils.memoize((pattern: String) => {
     val preparedSprite = Minecraft.getMinecraft.getTextureMapBlocks.getAtlasSprite(getPreparedTextureLocation(pattern).toString)
 
     val quads = ItemLayerModel.getQuadsForSprite(1, preparedSprite, DefaultVertexFormats.ITEM, Optional.empty())
