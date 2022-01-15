@@ -4,7 +4,7 @@ import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.blocks.BlockInfuser.TileInfuser
 import hohserg.soulkeeper.blocks.BlockRhOrb.TileRhOrb
 import hohserg.soulkeeper.blocks._
-import hohserg.soulkeeper.enchantments.{EnchantShiny, EnchantXPLeak}
+import hohserg.soulkeeper.enchantments.{EnchantInspire, EnchantShiny, EnchantXPLeak}
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
 import hohserg.soulkeeper.items.bottle.{ItemDustBottle, ItemEmptyBottle, ItemFilledBottle}
 import hohserg.soulkeeper.items.tools.{ItemRhAxe, ItemRhPickaxe, ItemRhShovel, ItemRhSword}
@@ -145,7 +145,7 @@ object Registration {
     PotionHelper.addMix(long, Items.GLOWSTONE_DUST, strong)
   }
 
-  lazy val enchantments = Seq(EnchantXPLeak, EnchantShiny)
+  lazy val enchantments = Seq(EnchantXPLeak, EnchantShiny, EnchantInspire)
 
   @SubscribeEvent
   def onRegisterEnchants(event: RegistryEvent.Register[Enchantment]): Unit = {
