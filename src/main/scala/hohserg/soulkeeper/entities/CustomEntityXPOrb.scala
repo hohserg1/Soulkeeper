@@ -74,7 +74,7 @@ class CustomEntityXPOrb(world: World) extends EntityXPOrb(world) with IEntityAdd
     val orbs = world.getEntitiesWithinAABB(classOf[CustomEntityXPOrb], this.getEntityBoundingBox.grow(1, 1, 1))
     for (i <- 0 until orbs.size) {
       val o = orbs.get(i)
-      if (!(o eq this)) {
+      if (o ne this) {
         if (o.consumerBlacklist == this.consumerBlacklist)
           if (o.isEntityAlive) {
             xpValue += o.xpValue
