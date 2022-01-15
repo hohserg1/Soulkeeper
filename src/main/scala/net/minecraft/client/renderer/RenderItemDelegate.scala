@@ -1,11 +1,10 @@
-package hohserg.soulkeeper.render
+package net.minecraft.client.renderer
 
 import java.util
 
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft.getMinecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.renderer._
 import net.minecraft.client.renderer.block.model.{BakedQuad, IBakedModel, ItemCameraTransforms}
 import net.minecraft.client.resources.IResourceManager
 import net.minecraft.entity.EntityLivingBase
@@ -32,23 +31,8 @@ class RenderItemDelegate(base: RenderItem) extends RenderItem(getMinecraft.getTe
   override def shouldRenderItemIn3D(stack: ItemStack): Boolean =
     base.shouldRenderItemIn3D(stack)
 
-  override def renderItem(stack: ItemStack, cameraTransformType: ItemCameraTransforms.TransformType): Unit =
-    base.renderItem(stack, cameraTransformType)
-
   override def getItemModelWithOverrides(stack: ItemStack, worldIn: World, entitylivingbaseIn: EntityLivingBase): IBakedModel =
     base.getItemModelWithOverrides(stack, worldIn, entitylivingbaseIn)
-
-  override def renderItem(stack: ItemStack, entitylivingbaseIn: EntityLivingBase, transform: ItemCameraTransforms.TransformType, leftHanded: Boolean): Unit =
-    base.renderItem(stack, entitylivingbaseIn, transform, leftHanded)
-
-  override def renderItemIntoGUI(stack: ItemStack, x: Int, y: Int): Unit =
-    base.renderItemIntoGUI(stack, x, y)
-
-  override def renderItemAndEffectIntoGUI(p_184391_1_ : EntityLivingBase, p_184391_2_ : ItemStack, p_184391_3_ : Int, p_184391_4_ : Int): Unit =
-    base.renderItemAndEffectIntoGUI(p_184391_1_, p_184391_2_, p_184391_3_, p_184391_4_)
-
-  override def renderItemAndEffectIntoGUI(stack: ItemStack, xPosition: Int, yPosition: Int): Unit =
-    base.renderItemAndEffectIntoGUI(stack, xPosition, yPosition)
 
   override def onResourceManagerReload(resourceManager: IResourceManager): Unit =
     base.onResourceManagerReload(resourceManager)
@@ -58,10 +42,4 @@ class RenderItemDelegate(base: RenderItem) extends RenderItem(getMinecraft.getTe
 
   override def registerItem(itm: Item, subType: Int, identifier: String): Unit =
     base.registerItem(itm, subType, identifier)
-
-  override def renderItemModel(stack: ItemStack, bakedmodel: IBakedModel, transform: ItemCameraTransforms.TransformType, leftHanded: Boolean): Unit =
-    base.renderItemModel(stack, bakedmodel, transform, leftHanded)
-
-  override def renderItemModelIntoGUI(stack: ItemStack, x: Int, y: Int, bakedmodel: IBakedModel): Unit =
-    base.renderItemModelIntoGUI(stack, x, y, bakedmodel)
 }

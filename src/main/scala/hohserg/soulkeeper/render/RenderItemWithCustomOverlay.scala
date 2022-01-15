@@ -46,13 +46,13 @@ class RenderItemWithCustomOverlay(base: RenderItem) extends RenderItemDelegate(b
   override def renderItemOverlayIntoGUI(fr: FontRenderer, stack: ItemStack, xPosition: Int, yPosition: Int, text: String): Unit = {
     renderSpecialBar(stack, xPosition, yPosition)
 
-    base.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, text)
+    super.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, text)
   }
 
   override def renderItemOverlays(fr: FontRenderer, stack: ItemStack, xPosition: Int, yPosition: Int): Unit = {
     renderSpecialBar(stack, xPosition, yPosition)
 
-    base.renderItemOverlays(fr, stack, xPosition, yPosition)
+    super.renderItemOverlays(fr, stack, xPosition, yPosition)
   }
 
   private def drawRect(x: Int, y: Double, width: Double, height: Double, red: Int, green: Int, blue: Int, alpha: Int): Unit = {

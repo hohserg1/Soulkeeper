@@ -8,7 +8,7 @@ object EnchantShiny extends Enchantment(Rarity.VERY_RARE, EnumEnchantmentType.AL
 
   override def getMinEnchantability(enchantmentLevel: Int): Int = 1
 
-  def getShinyColor(stack: ItemStack): Int = stack.getSubCompound("shiny").getInteger("color")
+  def getShinyColor(stack: ItemStack): Int = Option(stack.getSubCompound("shiny")).filter(_.hasKey("color")).map(_.getInteger("color")).getOrElse(-8372020)
 
-  def setShinyColor(stack: ItemStack, color: Int): Unit = stack.getSubCompound("shiny").setInteger("color", color)
+  def setShinyColor(stack: ItemStack, color: Int): Unit = stack.getOrCreateSubCompound("shiny").setInteger("color", color)
 }
