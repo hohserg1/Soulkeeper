@@ -22,3 +22,19 @@ item.item_dust_bottle.name=Заготовка хрустальной бутыл�
 soulkeeper.xp=Опыт:
 
 effect.xp_leak=Потеря опыта
+
+potion.effect.xp_leak_normal=Зелье потери опыта
+potion.effect.xp_leak_long=Зелье потери опыта
+potion.effect.xp_leak_strong=Зелье потери опыта
+splash_potion.effect.xp_leak_normal=Взрывное Зелье потери опыта
+splash_potion.effect.xp_leak_long=Взрывное Зелье потери опыта
+splash_potion.effect.xp_leak_strong=Взрывное Зелье потери опыта
+lingering_potion.effect.xp_leak_normal=Оседающее Зелье потери опыта
+lingering_potion.effect.xp_leak_long=Оседающее Зелье потери опыта
+lingering_potion.effect.xp_leak_strong=Оседающее Зелье потери опыта
+tipped_arrow.effect.xp_leak_normal=Стрела потери опыта
+tipped_arrow.effect.xp_leak_long=Стрела потери опыта
+tipped_arrow.effect.xp_leak_strong=Стрела потери опыта
+
+enchantment.enchant_x_p_leak=Разящий душу
+enchantment.enchant_shiny=Сияющий

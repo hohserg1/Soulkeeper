@@ -22,3 +22,19 @@ item.item_dust_bottle.name=Rhinestone Bottle Blank
 soulkeeper.xp=XP:
 
 effect.xp_leak=XP Leak
+
+potion.effect.xp_leak_normal=Potion of XP Leak
+potion.effect.xp_leak_long=Potion of XP Leak
+potion.effect.xp_leak_strong=Potion of XP Leak
+splash_potion.effect.xp_leak_normal=Splash Potion of XP Leak
+splash_potion.effect.xp_leak_long=Splash Potion of XP Leak
+splash_potion.effect.xp_leak_strong=Splash Potion of XP Leak
+lingering_potion.effect.xp_leak_normal=Lingering Potion of XP Leak
+lingering_potion.effect.xp_leak_long=Lingering Potion of XP Leak
+lingering_potion.effect.xp_leak_strong=Lingering Potion of XP Leak
+tipped_arrow.effect.xp_leak_normal=Arrow of XP Leak
+tipped_arrow.effect.xp_leak_long=Arrow of XP Leak
+tipped_arrow.effect.xp_leak_strong=Arrow of XP Leak
+
+enchantment.enchant_x_p_leak=Soul Smashing
+enchantment.enchant_shiny=Shiny
