@@ -4,7 +4,8 @@ import codechicken.lib.packet.PacketCustom;
 import hohserg.soulkeeper.Main;
 
 public enum PacketTypes {
-    SyncXPOrb;
+    SyncXPOrb,
+    ChangeRhOrbStep;
 
     public PacketCustom packet() {
         return new PacketCustom(Main.modid(), ordinal() + 1);

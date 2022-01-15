@@ -1,6 +1,7 @@
 package hohserg.soulkeeper.render
 
 import codechicken.lib.vec.Vector3
+import hohserg.soulkeeper.blocks.BlockRhOrb
 import hohserg.soulkeeper.blocks.BlockRhOrb.TileRhOrb
 import hohserg.soulkeeper.{Configuration, Main}
 import net.minecraft.client.Minecraft
@@ -142,7 +143,8 @@ object TileRhOrbRenderer extends BaseTESR[TileRhOrb] {
   }
 
   private def drawLabel(te: TileRhOrb, x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
-    val text = te.xp + "/" + Configuration.rhinestoneOrbCapacity
+    val text = te.xp + "/" + Configuration.rhinestoneOrbCapacity + " xp"
+    val test2 = BlockRhOrb.currentStep.toString
 
     val player = Minecraft.getMinecraft.player
     val dv = new Vector3(
@@ -151,6 +153,7 @@ object TileRhOrbRenderer extends BaseTESR[TileRhOrb] {
       te.getPos.getZ + 0.5 - (player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks)
     ).normalize().multiply(0.4)
     val a = (-Math.toDegrees(Math.atan2(dv.x, dv.z)) + 180 + 180).toFloat
-    drawString(text, x + 0.5 + dv.x, y + 0.9, z + 0.5 + dv.z, a)
+    drawString(text, x + 0.5 + dv.x, y + 1, z + 0.5 + dv.z, a)
+    drawString(test2, x + 0.5 + dv.x, y + 0.9, z + 0.5 + dv.z, a)
   }
 }

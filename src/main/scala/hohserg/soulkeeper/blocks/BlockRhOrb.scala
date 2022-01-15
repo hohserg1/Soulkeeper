@@ -1,12 +1,14 @@
 package hohserg.soulkeeper.blocks
 
 import hohserg.soulkeeper.api.{Capabilities, CapabilityXPContainer}
+import hohserg.soulkeeper.network.PacketTypes.ChangeRhOrbStep
 import hohserg.soulkeeper.{Configuration, Main, XPUtils}
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, SoundType}
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
 import net.minecraft.init.Items
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -20,10 +22,14 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
+
+import scala.collection.mutable
 
 @EventBusSubscriber(modid = Main.modid)
 object BlockRhOrb extends Block(Material.GLASS) with RhColor {
+
   setHardness(1)
   setResistance(10)
   setSoundType(SoundType.GLASS)
@@ -45,21 +51,61 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor {
   override def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos): AxisAlignedBB =
     new AxisAlignedBB(pixel, 0, pixel, 1d - pixel, 1d - pixel * 2, 1d - pixel)
 
+
+  val player2Step = new mutable.HashMap[String, InteractStep]
+
+  def onChangeStep(entityPlayerMP: EntityPlayerMP, id: Int): Unit = {
+    player2Step += entityPlayerMP.getName -> stepId.applyOrElse(id, (_: Int) => By1)
+  }
+
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, player: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (!worldIn.isRemote) {
       worldIn.getTileEntity(pos) match {
         case tile: TileRhOrb =>
           val playerXP = XPUtils.getPlayerXP(player)
+
+          val step = player2Step.getOrElseUpdate(player.getName, By1)
+
           if (player.isSneaking) {
-            if (tile.xp > 0) {
-              tile.xp -= 1
-              XPUtils.setPlayerXP(player, playerXP + 1)
+            val amount =
+              Math.min(
+                tile.xp,
+                step match {
+                  case By1 =>
+                    1
+                  case By10 =>
+                    10
+                  case By100 =>
+                    100
+                  case All =>
+                    tile.xp
+                }
+              )
+
+            if (tile.xp >= amount) {
+              tile.xp -= amount
+              XPUtils.setPlayerXP(player, playerXP + amount)
               tile.sendUpdates()
             }
           } else {
-            if (playerXP > 0 && tile.xp < Configuration.rhinestoneOrbCapacity) {
-              XPUtils.setPlayerXP(player, playerXP - 1)
-              tile.xp += 1
+            val amount =
+              Math.min(
+                playerXP,
+                step match {
+                  case By1 =>
+                    1
+                  case By10 =>
+                    10
+                  case By100 =>
+                    100
+                  case All =>
+                    playerXP
+                }
+              )
+
+            if (playerXP >= amount && tile.xp + amount <= Configuration.rhinestoneOrbCapacity) {
+              XPUtils.setPlayerXP(player, playerXP - amount)
+              tile.xp += amount
               tile.sendUpdates()
             }
           }
@@ -80,6 +126,81 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor {
 
         override def getXpCapacity: Int = Configuration.rhinestoneOrbCapacity
       })
+    }
+  }
+
+  sealed trait InteractStep {
+    def prev: InteractStep
+
+    def next: InteractStep
+  }
+
+  case object By1 extends InteractStep {
+    override def prev: InteractStep = All
+
+    override def next: InteractStep = By10
+
+    override def toString: String = "by 1 xp"
+  }
+
+  case object By10 extends InteractStep {
+    override def prev: InteractStep = By1
+
+    override def next: InteractStep = By100
+
+    override def toString: String = "by 10 xp"
+  }
+
+  case object By100 extends InteractStep {
+    override def prev: InteractStep = By10
+
+    override def next: InteractStep = All
+
+    override def toString: String = "by 100 xp"
+  }
+
+  case object All extends InteractStep {
+    override def prev: InteractStep = By100
+
+    override def next: InteractStep = By1
+
+    override def toString: String = "by all xp"
+  }
+
+  val stepId = Seq(By1, By10, By100, All)
+
+  var currentStep: InteractStep = By1
+  var prevSlot = -1
+
+  @SubscribeEvent
+  def rollStep(event: PlayerTickEvent): Unit = {
+    val player = event.player
+    val world = player.world
+    if (world.isRemote) {
+      val result = Minecraft.getMinecraft.objectMouseOver
+      if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
+        if (world.getBlockState(result.getBlockPos).getBlock == this) {
+
+          if (prevSlot == -1)
+            prevSlot = player.inventory.currentItem
+
+          val roll = player.inventory.currentItem - prevSlot
+
+          val nextStep =
+            if (roll > 0) {
+              (1 to roll).foldLeft(currentStep) { case (r, _) => r.next }
+            } else if (roll < 0) {
+              (1 to -roll).foldLeft(currentStep) { case (r, _) => r.prev }
+            } else
+              currentStep
+
+          if (currentStep != nextStep) {
+            currentStep = nextStep
+            prevSlot = player.inventory.currentItem
+            ChangeRhOrbStep.packet().writeInt(stepId.indexOf(currentStep)).sendToServer()
+          }
+        }
+      }
     }
   }
 
