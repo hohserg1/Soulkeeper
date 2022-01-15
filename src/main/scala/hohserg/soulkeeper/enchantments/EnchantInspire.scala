@@ -6,12 +6,13 @@ import hohserg.soulkeeper.items.tools.RhTool
 import net.minecraft.enchantment.Enchantment.Rarity
 import net.minecraft.enchantment.{Enchantment, EnchantmentHelper, EnumEnchantmentType}
 import net.minecraft.init.Enchantments
+import net.minecraft.inventory.EntityEquipmentSlot
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.{EventPriority, SubscribeEvent}
 
 @EventBusSubscriber(modid = Main.modid)
-object EnchantInspire extends Enchantment(Rarity.COMMON, EnumEnchantmentType.BREAKABLE, Array()) {
+object EnchantInspire extends Enchantment(Rarity.COMMON, EnumEnchantmentType.BREAKABLE, Array(EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND)) {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   def onPickupXpOrb(event: PlayerPickupXpEvent): Unit = {
     val stack = EnchantmentHelper.getEnchantedItem(this, event.getEntityPlayer)
