@@ -3,6 +3,7 @@ package hohserg.soulkeeper.blocks
 import hohserg.soulkeeper.XPUtils
 import hohserg.soulkeeper.api.CapabilityXPContainer
 import hohserg.soulkeeper.api.crafting.{DummyInfuserRecipe, InfuserRecipe, StepInfuserRecipe}
+import hohserg.soulkeeper.items.HasHelp
 import javax.annotation.Nonnull
 import net.minecraft.block.Block
 import net.minecraft.block.material.{MapColor, Material}
@@ -20,7 +21,7 @@ import net.minecraft.world.{IBlockAccess, World, WorldServer}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.items.{CapabilityItemHandler, ItemStackHandler}
 
-object BlockInfuser extends Block(Material.ROCK, MapColor.PURPLE) {
+object BlockInfuser extends Block(Material.ROCK, MapColor.PURPLE) with HasHelp{
   setLightOpacity(0)
   setHardness(5)
   setResistance(2000)

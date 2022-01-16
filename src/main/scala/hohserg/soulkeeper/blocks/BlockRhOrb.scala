@@ -1,6 +1,7 @@
 package hohserg.soulkeeper.blocks
 
 import hohserg.soulkeeper.api.{Capabilities, CapabilityXPContainer}
+import hohserg.soulkeeper.items.HasHelp
 import hohserg.soulkeeper.network.PacketTypes.ChangeRhOrbStep
 import hohserg.soulkeeper.{Configuration, Main, XPUtils}
 import net.minecraft.block.material.Material
@@ -28,7 +29,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import scala.collection.mutable
 
 @EventBusSubscriber(modid = Main.modid)
-object BlockRhOrb extends Block(Material.GLASS) with RhColor {
+object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp{
 
   setHardness(1)
   setResistance(10)

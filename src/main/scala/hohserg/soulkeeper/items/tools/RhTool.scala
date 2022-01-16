@@ -1,7 +1,7 @@
 package hohserg.soulkeeper.items.tools
 
 import hohserg.soulkeeper.api.ItemXPContainer
-import hohserg.soulkeeper.items.{ItemRhinestoneDust, ItemTinyRhinestoneDust}
+import hohserg.soulkeeper.items.{HasHelp, ItemRhinestoneDust, ItemTinyRhinestoneDust}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.enchantment.{EnchantmentDurability, EnchantmentHelper}
@@ -13,7 +13,7 @@ import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.{EnumHand, NonNullList}
 import net.minecraft.world.World
 
-trait RhTool extends ItemXPContainer {
+trait RhTool extends ItemXPContainer with HasHelp{
   self: Item =>
 
   override def getXpCapacity(stack: ItemStack): Int = stack.getMaxDamage

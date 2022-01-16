@@ -12,7 +12,7 @@ import hohserg.soulkeeper.items.{ItemDebugXPMeter, ItemRhShield, ItemRhinestoneD
 import hohserg.soulkeeper.potions.EffectXPLeak
 import net.minecraft.block.Block
 import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.enchantment.Enchantment
+import net.minecraft.enchantment.{Enchantment, EnumEnchantmentType}
 import net.minecraft.entity.Entity
 import net.minecraft.init.{Items, PotionTypes}
 import net.minecraft.item.crafting.{IRecipe, Ingredient, ShapedRecipes}
@@ -145,7 +145,7 @@ object Registration {
     PotionHelper.addMix(long, Items.GLOWSTONE_DUST, strong)
   }
 
-  lazy val enchantments = Seq(EnchantXPLeak, EnchantShiny, EnchantInspire)
+  lazy val enchantments = Set(EnchantXPLeak, EnchantShiny, EnchantInspire)
 
   @SubscribeEvent
   def onRegisterEnchants(event: RegistryEvent.Register[Enchantment]): Unit = {

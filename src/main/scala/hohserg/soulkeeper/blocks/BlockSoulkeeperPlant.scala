@@ -5,7 +5,7 @@ import java.util.Random
 import hohserg.soulkeeper.Configuration
 import hohserg.soulkeeper.capability.chunk.ExpInChunkProvider
 import hohserg.soulkeeper.entities.CustomEntityXPOrb
-import hohserg.soulkeeper.items.ItemTinyRhinestoneDust
+import hohserg.soulkeeper.items.{HasHelp, ItemTinyRhinestoneDust}
 import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
@@ -22,7 +22,7 @@ import net.minecraftforge.common.util.FakePlayerFactory
 
 import scala.collection.JavaConverters._
 
-object BlockSoulkeeperPlant extends Block(Material.PLANTS) {
+object BlockSoulkeeperPlant extends Block(Material.PLANTS) with HasHelp{
   setSoundType(SoundType.GLASS)
   lightValue = 2
 

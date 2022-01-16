@@ -2,6 +2,7 @@ package hohserg.soulkeeper.items.bottle
 
 import java.util
 
+import hohserg.soulkeeper.items.HasHelp
 import hohserg.soulkeeper.{Configuration, XPUtils}
 import net.minecraft.client.resources.I18n
 import net.minecraft.client.util.ITooltipFlag
@@ -12,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.{ActionResult, EnumActionResult, EnumHand}
 import net.minecraft.world.World
 
-object ItemFilledBottle extends Item {
+object ItemFilledBottle extends Item with HasHelp{
   setMaxStackSize(1)
 
   override def hasEffect(stack: ItemStack): Boolean = true
