@@ -1,7 +1,7 @@
 package hohserg.soulkeeper.handlers
 
 import hohserg.soulkeeper.Main
-import hohserg.soulkeeper.blocks.{BlockDarkRhinestoneStalactite, BlockRhOrb}
+import hohserg.soulkeeper.blocks.{BlockDarkRhinestoneStalactite, BlockRhOrb, BlockRhPowderOrb}
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -11,7 +11,7 @@ object RemoveOnTouchOverlay {
 
   @SubscribeEvent
   def removeOnTouchOverlay(e: RenderBlockOverlayEvent): Unit = {
-    if (e.getBlockForOverlay.getBlock == BlockDarkRhinestoneStalactite || e.getBlockForOverlay.getBlock == BlockRhOrb)
+    if (e.getBlockForOverlay.getBlock == BlockDarkRhinestoneStalactite || e.getBlockForOverlay.getBlock == BlockRhOrb || e.getBlockForOverlay.getBlock==BlockRhPowderOrb)
       e.setCanceled(true)
   }
 
