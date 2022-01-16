@@ -1,16 +1,17 @@
 package hohserg.soulkeeper.enchantments
 
 import hohserg.soulkeeper.Main
-import hohserg.soulkeeper.utils.color.RGBA
+import hohserg.soulkeeper.utils.color.{HSBA, RGBA}
 import net.minecraft.enchantment.Enchantment.Rarity
 import net.minecraft.enchantment.{Enchantment, EnchantmentHelper, EnumEnchantmentType}
 import net.minecraft.inventory.InventoryCrafting
-import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.IRecipe
+import net.minecraft.item.{EnumDyeColor, ItemStack}
 import net.minecraft.world.World
 import net.minecraftforge.event.RegistryEvent
+import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.eventhandler.{EventPriority, SubscribeEvent}
 import net.minecraftforge.oredict.DyeUtils
 import net.minecraftforge.registries.IForgeRegistryEntry
 
@@ -33,6 +34,15 @@ object EnchantShiny extends Enchantment(Rarity.VERY_RARE, EnumEnchantmentType.AL
     stack.hasTagCompound &&
       stack.getTagCompound.hasKey("shiny", 10) &&
       stack.getSubCompound("shiny").hasKey("color", 99)
+
+  @SubscribeEvent(priority = EventPriority.LOW)
+  def addHexTooltip(event: ItemTooltipEvent): Unit = {
+    if (EnchantmentHelper.getEnchantmentLevel(this, event.getItemStack) > 0) {
+      val tooltip = event.getToolTip
+      val name = getTranslatedName(1)
+      tooltip.set(tooltip.indexOf(name), name + ": #" + (getShinyColor(event.getItemStack) & 0xffffff).toHexString)
+    }
+  }
 
   @SubscribeEvent
   def registerColoringRecipe(event: RegistryEvent.Register[IRecipe]): Unit = {
@@ -72,17 +82,36 @@ object EnchantShiny extends Enchantment(Rarity.VERY_RARE, EnumEnchantmentType.AL
           (if (hasColorTag(result)) {
             Seq(RGBA.fromARGB(getShinyColor(result)))
           } else
-            Seq()) ++ ingredients(Dye).map(DyeUtils.colorFromStack(_).get().getColorValue).map(RGBA.fromRGB)
+            Seq()) ++ ingredients(Dye).map(DyeUtils.colorFromStack(_).get()).map(toRGBA)
 
         val sum = colorsToMix.foldLeft((0f, 0f, 0f)) { case ((sr, sg, sb), c) => (sr + c.getRF, sg + c.getGF, sb + c.getBF) }
 
-        val resultColor = new RGBA(sum._1 / colorsToMix.size, sum._2 / colorsToMix.size, sum._3 / colorsToMix.size)
-          .toHSBA.setB(0.8f).setS(0.7f).toRGBA.argb()
-
-        println(resultColor.toHexString)
+        val resultColor = setSaturation(new RGBA(sum._1 / colorsToMix.size, sum._2 / colorsToMix.size, sum._3 / colorsToMix.size)).toRGBA.argb()
 
         setShinyColor(result, resultColor)
         result
+      }
+
+      def toRGBA(color: EnumDyeColor): RGBA =
+        color match {
+          case EnumDyeColor.GRAY =>
+            new RGBA(0.3f, 0.3f, 0.3f)
+          case EnumDyeColor.WHITE =>
+            new RGBA(1f, 1f, 1f)
+          case EnumDyeColor.SILVER =>
+            new RGBA(0.6f, 0.6f, 0.6f)
+          case EnumDyeColor.BLACK =>
+            new RGBA(0.1f, 0.1f, 0.1f)
+          case _ =>
+            RGBA.fromRGB(color.getColorValue)
+        }
+
+      def setSaturation(color: RGBA): HSBA = {
+        val hsba = color.toHSBA
+        if (color.getRI == color.getGI && color.getGI == color.getBI)
+          hsba.setB(hsba.getB + 0.2f)
+        else
+          hsba.setS(0.7f).setB(0.7f)
       }
 
       override def canFit(width: Int, height: Int): Boolean = width * height >= 2
