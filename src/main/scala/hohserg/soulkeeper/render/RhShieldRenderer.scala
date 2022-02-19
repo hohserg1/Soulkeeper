@@ -52,9 +52,6 @@ object RhShieldRenderer extends TileEntityItemStackRenderer {
         val resultImage1 = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
         resultImage1.setRGB(0, 0, w, h, (0 until w * h).map(_ => 0).toArray, 0, 0)
 
-        val resultImage2 = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
-        resultImage2.setRGB(0, 0, w, h, (0 until w * h).map(_ => 0).toArray, 0, 0)
-
         try {
           val image = MinecraftForgeClient.getImageLayer(patternTextureLocation, Minecraft.getMinecraft.getResourceManager)
 
@@ -62,12 +59,9 @@ object RhShieldRenderer extends TileEntityItemStackRenderer {
             x <- 0 to 9
             y <- 0 to 19
             color = RGBA.fromARGB(image.getRGB(x + 2, y + 2)).toHSBA
-          } {
-            if (color.getB != 0) {
-              resultImage1.setRGB(x, y, RGBA.fromARGB(0x805CD3D8).toHSBA.setB(color.getB).toRGBA.argb())
-              resultImage2.setRGB(x, y, RGBA.fromARGB(0x80C7FFB2).toHSBA.setB(color.getB).toRGBA.argb())
-            }
           }
+            if (color.getB != 0)
+              resultImage1.setRGB(x, y, RGBA.fromARGB(0x805CD3D8).toHSBA.setB(color.getB).toRGBA.argb())
 
           TextureUtils.getTextureSpecial(textureMap, getPreparedTextureLocation(pattern).toString)
             .addTexture(new TextureDataHolder(resultImage1))
