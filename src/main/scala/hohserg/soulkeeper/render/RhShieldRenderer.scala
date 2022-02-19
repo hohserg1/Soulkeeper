@@ -2,7 +2,7 @@ package hohserg.soulkeeper.render
 
 import java.awt.image.BufferedImage
 import java.util
-import java.util.{Optional, function}
+import java.util.Optional
 
 import codechicken.lib.texture.{TextureDataHolder, TextureUtils}
 import com.google.common.collect.ImmutableList
@@ -55,22 +55,26 @@ object RhShieldRenderer extends TileEntityItemStackRenderer {
         val resultImage2 = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
         resultImage2.setRGB(0, 0, w, h, (0 until w * h).map(_ => 0).toArray, 0, 0)
 
-        val image = MinecraftForgeClient.getImageLayer(patternTextureLocation, Minecraft.getMinecraft.getResourceManager)
+        try {
+          val image = MinecraftForgeClient.getImageLayer(patternTextureLocation, Minecraft.getMinecraft.getResourceManager)
 
-        for {
-          x <- 0 to 9
-          y <- 0 to 19
-          color = RGBA.fromARGB(image.getRGB(x + 2, y + 2)).toHSBA
-        } {
-          if (color.getB != 0) {
-            resultImage1.setRGB(x, y, RGBA.fromARGB(0x805CD3D8).toHSBA.setB(color.getB).toRGBA.argb())
-            resultImage2.setRGB(x, y, RGBA.fromARGB(0x80C7FFB2).toHSBA.setB(color.getB).toRGBA.argb())
+          for {
+            x <- 0 to 9
+            y <- 0 to 19
+            color = RGBA.fromARGB(image.getRGB(x + 2, y + 2)).toHSBA
+          } {
+            if (color.getB != 0) {
+              resultImage1.setRGB(x, y, RGBA.fromARGB(0x805CD3D8).toHSBA.setB(color.getB).toRGBA.argb())
+              resultImage2.setRGB(x, y, RGBA.fromARGB(0x80C7FFB2).toHSBA.setB(color.getB).toRGBA.argb())
+            }
           }
-        }
 
-        TextureUtils.getTextureSpecial(textureMap, getPreparedTextureLocation(pattern).toString)
-          .addTexture(new TextureDataHolder(resultImage1))
-        //.addTexture(new TextureDataHolder(resultImage2))
+          TextureUtils.getTextureSpecial(textureMap, getPreparedTextureLocation(pattern).toString)
+            .addTexture(new TextureDataHolder(resultImage1))
+        } catch {
+          case e: Throwable =>
+            println("Exception while preparing shield pattern texture: " + e.getMessage)
+        }
       }
 
   val getDisignModel: String => IBakedModel = LambdaUtils.memoize((pattern: String) => {
