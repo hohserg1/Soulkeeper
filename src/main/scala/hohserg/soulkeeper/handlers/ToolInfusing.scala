@@ -1,10 +1,10 @@
 package hohserg.soulkeeper.handlers
 
-import hohserg.soulkeeper.{Main, XPUtils}
 import hohserg.soulkeeper.items.tools.RhTool
 import hohserg.soulkeeper.utils.AnvilUtils
-import net.minecraft.advancements.{CriteriaTriggers, ICriterionTrigger, PlayerAdvancements}
+import hohserg.soulkeeper.{Main, XPUtils}
 import net.minecraft.advancements.critereon.{EnchantedItemTrigger, ItemPredicate, MinMaxBounds}
+import net.minecraft.advancements.{CriteriaTriggers, ICriterionTrigger, PlayerAdvancements}
 import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -34,21 +34,29 @@ object ToolInfusing {
         val uuid = player.getUniqueID
         val playerList = player.getServer.getPlayerList
 
+        val predicate = new EnchantedItemTrigger.Instance(ItemPredicate.ANY, new MinMaxBounds(null, null)) {
+          override def test(stack: ItemStack, levelsIn: Int): Boolean = {
+
+            onEnchanted(playerList.getPlayerByUUID(uuid), stack, levelsIn)
+
+            super.test(stack, levelsIn)
+          }
+        }
+
+        val vanillaAchivementId = new ResourceLocation("minecraft", "story/enchant_item")
+
+        val listenerName = "enchantment_handler"
+
+        val hash = 31 * (31 * predicate.hashCode + vanillaAchivementId.hashCode) + listenerName.hashCode
+
         CriteriaTriggers.ENCHANTED_ITEM.addListener(
           player.getAdvancements,
-          new ICriterionTrigger.Listener[EnchantedItemTrigger.Instance](
-            new EnchantedItemTrigger.Instance(ItemPredicate.ANY, new MinMaxBounds(null, null)) {
-              override def test(stack: ItemStack, levelsIn: Int): Boolean = {
-
-                onEnchanted(playerList.getPlayerByUUID(uuid), stack, levelsIn)
-
-                super.test(stack, levelsIn)
-              }
-            },
-            player.getServerWorld.getAdvancementManager.getAdvancement(new ResourceLocation("minecraft", "story/enchant_item")),
-            "enchantment_handler"
-          ) {
+          new ICriterionTrigger.Listener[EnchantedItemTrigger.Instance](predicate, player.getServerWorld.getAdvancementManager.getAdvancement(vanillaAchivementId), listenerName) {
             override def grantCriterion(playerAdvancementsIn: PlayerAdvancements): Unit = ()
+
+            override def equals(other: Any): Boolean = other == this
+
+            override def hashCode(): Int = hash
           }
         )
       case _ =>
