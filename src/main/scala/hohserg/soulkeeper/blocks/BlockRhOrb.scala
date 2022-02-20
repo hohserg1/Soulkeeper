@@ -132,7 +132,7 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp {
   }
 
   @SubscribeEvent
-  def attachCapaToTile(event: AttachCapabilitiesEvent[TileEntity]): Unit = {
+  def attachCapaToTile(event: AttachCapabilitiesEvent[TileEntity]): Unit =
     event.getObject match {
       case tile: TileRhOrb =>
         addCapa(event, new CapabilityXPContainer {
@@ -147,7 +147,7 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp {
         }, ItemStack.EMPTY)
       case _ =>
     }
-  }
+
 
   def addCapa(event: AttachCapabilitiesEvent[_], xpCapa: CapabilityXPContainer, stack: ItemStack): Unit = {
     event.addCapability(new ResourceLocation(Main.modid, "capa_xp_container"), xpCapa)

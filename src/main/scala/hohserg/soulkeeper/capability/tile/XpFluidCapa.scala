@@ -26,7 +26,7 @@ class XpFluidCapa(xpCapa: CapabilityXPContainer, val getContainer: ItemStack) ex
 
   override lazy val getTankProperties: Array[IFluidTankProperties] = Array[IFluidTankProperties](new XpFluidTankProperties(this))
 
-  override def fill(resource: FluidStack, doFill: Boolean): Int = {
+  override def fill(resource: FluidStack, doFill: Boolean): Int =
     if (resource != null && resource.amount > 0 && isValidFluid(resource)) {
       val insertionAmountXP = XpUtil.liquidToExperience(resource.amount)
       val freeSpaceXP = xpCapa.getXpCapacity - xpCapa.getXp
@@ -39,7 +39,6 @@ class XpFluidCapa(xpCapa: CapabilityXPContainer, val getContainer: ItemStack) ex
         0
     } else
       0
-  }
 
   override def drain(resource: FluidStack, doDrain: Boolean): FluidStack =
     if (isValidFluid(resource))
@@ -47,7 +46,7 @@ class XpFluidCapa(xpCapa: CapabilityXPContainer, val getContainer: ItemStack) ex
     else
       null
 
-  override def drain(maxDrainFluid: Int, doDrain: Boolean): FluidStack = {
+  override def drain(maxDrainFluid: Int, doDrain: Boolean): FluidStack =
     if (maxDrainFluid > 0) {
       val extractionAmountXP = XpUtil.liquidToExperience(maxDrainFluid)
       val canExtractXP = Math.min(xpCapa.getXp, extractionAmountXP)
@@ -59,7 +58,6 @@ class XpFluidCapa(xpCapa: CapabilityXPContainer, val getContainer: ItemStack) ex
         null
     } else
       null
-  }
 }
 
 object XpFluidCapa {
@@ -97,8 +95,6 @@ object XpFluidCapa {
       isValidFluid(fluidStack)
   }
 
-  def isValidFluid(fluidStack: FluidStack) = {
+  def isValidFluid(fluidStack: FluidStack) =
     fluidStack != null && fluidStack.getFluid != null && FluidUtil.areFluidsTheSame(fluidStack.getFluid, Fluids.XP_JUICE.getFluid)
-  }
-
 }
