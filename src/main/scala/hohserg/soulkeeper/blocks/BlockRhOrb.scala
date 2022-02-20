@@ -31,7 +31,6 @@ import scala.collection.mutable
 
 @EventBusSubscriber(modid = Main.modid)
 object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp {
-
   setHardness(1)
   setResistance(10)
   setSoundType(SoundType.GLASS)
