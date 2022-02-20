@@ -1,6 +1,7 @@
 package hohserg.soulkeeper.blocks
 
-import hohserg.soulkeeper.api.{Capabilities, CapabilityXPContainer}
+import hohserg.soulkeeper.api.CapabilityXPContainer
+import hohserg.soulkeeper.capability.tile.XpFluidCapa
 import hohserg.soulkeeper.items.HasHelp
 import hohserg.soulkeeper.network.PacketTypes.ChangeRhOrbStep
 import hohserg.soulkeeper.{Configuration, Main, XPUtils}
@@ -19,8 +20,8 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util._
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult}
 import net.minecraft.world.{IBlockAccess, World, WorldServer}
-import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent
@@ -29,7 +30,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import scala.collection.mutable
 
 @EventBusSubscriber(modid = Main.modid)
-object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp{
+object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp {
 
   setHardness(1)
   setResistance(10)
@@ -120,14 +121,39 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp{
   def attachCapaToItem(event: AttachCapabilitiesEvent[ItemStack]): Unit = {
     val stack = event.getObject
     if (Item.getItemFromBlock(this) != Items.AIR && stack.getItem == Item.getItemFromBlock(this)) {
-      event.addCapability(new ResourceLocation(Main.modid, "capa_xp_container"), new CapabilityXPContainer {
+      addCapa(event, new CapabilityXPContainer {
         override def getXp: Int = stack.getOrCreateSubCompound("xp_container").getInteger("xp")
 
         override def setXp(amount: Int): Unit = stack.getOrCreateSubCompound("xp_container").setInteger("xp", Math.max(0, Math.min(amount, getXpCapacity)))
 
         override def getXpCapacity: Int = Configuration.rhinestoneOrbCapacity
-      })
+      }, stack)
     }
+  }
+
+  @SubscribeEvent
+  def attachCapaToTile(event: AttachCapabilitiesEvent[TileEntity]): Unit = {
+    event.getObject match {
+      case tile: TileRhOrb =>
+        addCapa(event, new CapabilityXPContainer {
+          override def getXpCapacity: Int = Configuration.rhinestoneOrbCapacity
+
+          override def getXp: Int = tile.xp
+
+          override def setXp(amount: Int): Unit = {
+            tile.xp = amount
+            tile.sendUpdates()
+          }
+        }, ItemStack.EMPTY)
+      case _ =>
+    }
+  }
+
+  def addCapa(event: AttachCapabilitiesEvent[_], xpCapa: CapabilityXPContainer, stack: ItemStack): Unit = {
+    event.addCapability(new ResourceLocation(Main.modid, "capa_xp_container"), xpCapa)
+
+    if (Loader.isModLoaded("enderio"))
+      event.addCapability(new ResourceLocation(Main.modid, "capa_xp_fluid"), new XpFluidCapa.Provider(xpCapa, stack))
   }
 
   sealed trait InteractStep {
@@ -179,29 +205,28 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp{
     val world = player.world
     if (world.isRemote) {
       val result = Minecraft.getMinecraft.objectMouseOver
-      if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
-        if (world.getBlockState(result.getBlockPos).getBlock == this) {
+      if (result.typeOfHit == RayTraceResult.Type.BLOCK && world.getBlockState(result.getBlockPos).getBlock == this) {
 
-          if (prevSlot == -1)
-            prevSlot = player.inventory.currentItem
+        if (prevSlot == -1)
+          prevSlot = player.inventory.currentItem
 
-          val roll = player.inventory.currentItem - prevSlot
+        val roll = player.inventory.currentItem - prevSlot
 
-          val nextStep =
-            if (roll > 0) {
-              (1 to roll).foldLeft(currentStep) { case (r, _) => r.next }
-            } else if (roll < 0) {
-              (1 to -roll).foldLeft(currentStep) { case (r, _) => r.prev }
-            } else
-              currentStep
+        val nextStep =
+          if (roll > 0) {
+            (1 to roll).foldLeft(currentStep) { case (r, _) => r.next }
+          } else if (roll < 0) {
+            (1 to -roll).foldLeft(currentStep) { case (r, _) => r.prev }
+          } else
+            currentStep
 
-          if (currentStep != nextStep) {
-            currentStep = nextStep
-            prevSlot = player.inventory.currentItem
-            ChangeRhOrbStep.packet().writeInt(stepId.indexOf(currentStep)).sendToServer()
-          }
+        if (currentStep != nextStep) {
+          currentStep = nextStep
+          player.inventory.currentItem = prevSlot
+          ChangeRhOrbStep.packet().writeInt(stepId.indexOf(currentStep)).sendToServer()
         }
-      }
+      } else
+        prevSlot = -1
     }
   }
 
@@ -257,23 +282,6 @@ object BlockRhOrb extends Block(Material.GLASS) with RhColor with HasHelp{
 
     override def getUpdatePacket: SPacketUpdateTileEntity =
       new SPacketUpdateTileEntity(pos, 3, getUpdateTag)
-
-    override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
-      capability == Capabilities.CAPABILITY_XP_CONTAINER || super.hasCapability(capability, facing)
-
-    override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
-      if (capability == Capabilities.CAPABILITY_XP_CONTAINER)
-        Capabilities.CAPABILITY_XP_CONTAINER.cast(
-          new CapabilityXPContainer {
-            override def getXpCapacity: Int = Configuration.rhinestoneOrbCapacity
-
-            override def getXp: Int = xp
-
-            override def setXp(amount: Int): Unit = xp = amount
-          }
-        )
-      else
-        super.getCapability(capability, facing)
 
     def sendUpdates(): Unit =
       world match {
