@@ -1,7 +1,5 @@
 package hohserg.soulkeeper.items
 
-import java.util
-
 import hohserg.soulkeeper.Main
 import hohserg.soulkeeper.items.tools.{RhTool, rhinestone}
 import net.minecraft.advancements.critereon.{ItemDurabilityTrigger, ItemPredicate, MinMaxBounds}
@@ -16,6 +14,8 @@ import net.minecraft.world.World
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent
+
+import java.util
 
 @EventBusSubscriber(modid = Main.modid)
 object ItemRhShield extends ItemShield with RhTool {
@@ -55,21 +55,28 @@ object ItemRhShield extends ItemShield with RhTool {
         val uuid = player.getUniqueID
         val playerList = player.getServer.getPlayerList
 
+        val predicate = new ItemDurabilityTrigger.Instance(ItemPredicate.ANY, new MinMaxBounds(null, null), new MinMaxBounds(null, null)) {
+          override def test(item: ItemStack, newDamage: Int): Boolean = {
+            onDamageItem(playerList.getPlayerByUUID(uuid), item, item.getItemDamage, newDamage)
+
+            super.test(item, newDamage)
+          }
+        }
+
+        val vanillaAchivementId = new ResourceLocation("minecraft", "husbandry/break_diamond_hoe")
+
+        val listenerName = "item_damage_handler"
+
+        val hash = 31 * (31 * predicate.hashCode + vanillaAchivementId.hashCode) + listenerName.hashCode
 
         CriteriaTriggers.ITEM_DURABILITY_CHANGED.addListener(
           player.getAdvancements,
-          new ICriterionTrigger.Listener[ItemDurabilityTrigger.Instance](
-            new ItemDurabilityTrigger.Instance(ItemPredicate.ANY, new MinMaxBounds(null, null), new MinMaxBounds(null, null)) {
-              override def test(item: ItemStack, newDamage: Int): Boolean = {
-                onDamageItem(playerList.getPlayerByUUID(uuid), item, item.getItemDamage, newDamage)
-
-                super.test(item, newDamage)
-              }
-            },
-            player.getServerWorld.getAdvancementManager.getAdvancement(new ResourceLocation("minecraft", "husbandry/break_diamond_hoe")),
-            "item_damage_handler"
-          ) {
+          new ICriterionTrigger.Listener[ItemDurabilityTrigger.Instance](predicate, player.getServerWorld.getAdvancementManager.getAdvancement(vanillaAchivementId), listenerName) {
             override def grantCriterion(playerAdvancementsIn: PlayerAdvancements): Unit = ()
+
+            override def equals(other: Any): Boolean = other == this
+
+            override def hashCode(): Int = hash
           }
         )
 
