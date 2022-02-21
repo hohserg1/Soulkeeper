@@ -59,7 +59,6 @@ class CustomEntityXPOrb(world: World) extends EntityXPOrb(world) with IEntityAdd
     super.fall(distance, damageMultiplier)
 
     if (!world.isRemote) {
-
       if (world.getBlockState(underPos).getBlock != BlockDarkRhinestonePowder)
         if (halfOnFallingCooldown == 0) {
           halfOnFallingCooldown = 20 * 10
