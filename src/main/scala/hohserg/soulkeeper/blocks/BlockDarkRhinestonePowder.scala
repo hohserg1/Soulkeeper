@@ -20,6 +20,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+import java.util.Random
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
@@ -41,10 +42,31 @@ object BlockDarkRhinestonePowder extends BlockFalling(Material.SAND) with ItemBl
 
   /*difference to infused version*/
   private def choiceValue[A](state: IBlockState, rock: A, powder: A): A =
-    if (state.getValue(infuseProperty) == 15)
-      rock
-    else
+    if (isPowder(state))
       powder
+    else
+      rock
+
+  private def isPowder(state: IBlockState) =
+    state.getValue(infuseProperty) != 15
+
+  override def onBlockAdded(worldIn: World, pos: BlockPos, state: IBlockState): Unit =
+    if (isPowder(state))
+      worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn))
+
+
+  override def neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos): Unit =
+    if (isPowder(state))
+      worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn))
+
+
+  override def updateTick(worldIn: World, pos: BlockPos, state: IBlockState, rand: Random): Unit =
+    if (isPowder(state))
+      super.updateTick(worldIn, pos, state, rand)
+
+  override def randomDisplayTick(state: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit =
+    if (isPowder(state))
+      super.randomDisplayTick(state, worldIn, pos, rand)
 
   override def getBlockHardness(state: IBlockState, worldIn: World, pos: BlockPos): Float =
     choiceValue(state, 5, 1)
