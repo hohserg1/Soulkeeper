@@ -36,7 +36,6 @@ object ToolInfusing {
 
         val predicate = new EnchantedItemTrigger.Instance(ItemPredicate.ANY, new MinMaxBounds(null, null)) {
           override def test(stack: ItemStack, levelsIn: Int): Boolean = {
-
             onEnchanted(playerList.getPlayerByUUID(uuid), stack, levelsIn)
 
             super.test(stack, levelsIn)
