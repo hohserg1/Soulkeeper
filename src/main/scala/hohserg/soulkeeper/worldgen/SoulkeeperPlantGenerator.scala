@@ -21,7 +21,7 @@ object SoulkeeperPlantGenerator extends IWorldGenerator {
     if (world.provider.getDimension == 0) {
       val (startX, startZ) = (chunkX << 4, chunkZ << 4)
 
-      WorldGenUtils.generateInArea(new BlockPos(startX, 14, startZ), new BlockPos(startX + 15, 57, startZ + 15), pos => {
+      WorldGenUtils.generateInArea(new BlockPos(startX + 8, 14, startZ + 8), new BlockPos(startX + 15 + 8, 57, startZ + 15 + 8), pos => {
         if (Configuration.soulkeeperGenWhitelist.contains(world.getBlockState(pos).getBlock)
           && world.isAirBlock(pos.up())
           && onWater(world, pos)
