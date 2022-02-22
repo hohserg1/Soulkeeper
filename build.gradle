@@ -87,7 +87,11 @@ jar {
 jar.finalizedBy('reobfJar')
 
 processResources {
-    filter {
-        String line -> line.replaceAll('\\$\\{version\\}', modVersion)
+    from('src/main/resources') {
+        include 'mcmod.info'
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        filter {
+            line -> line.replaceAll('\\$\\{version\\}', modVersion)
+        }
     }
 }
