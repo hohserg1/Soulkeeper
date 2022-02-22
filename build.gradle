@@ -95,3 +95,10 @@ processResources {
         }
     }
 }
+
+task cleanBuild {
+    delete './build/classes/'
+    delete './build/generated/'
+    delete './build/resources/'
+    delete './build/libs/'
+}
