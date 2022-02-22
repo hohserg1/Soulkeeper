@@ -23,7 +23,8 @@ object WorldGenUtils {
     generateInAreaBreakly(start, end, generate.andThen(_ => true))
 
   def setBlockAndNotifyAdequately(notify: Boolean, world: World, pos: BlockPos, state: IBlockState): Unit = {
-    if (notify) world.setBlockState(pos, state, 3)
+    if (notify)
+      world.setBlockState(pos, state, 3)
     else {
       val flag = if (net.minecraftforge.common.ForgeModContainer.fixVanillaCascading) 2 | 16 else 2 //Forge: With bit 5 unset, it will notify neighbors and load adjacent chunks.
       world.setBlockState(pos, state, flag)

@@ -1,7 +1,5 @@
 package hohserg.soulkeeper.worldgen
 
-import java.util.Random
-
 import hohserg.soulkeeper.Configuration
 import hohserg.soulkeeper.blocks.{BlockSoulkeeperPlant, GrowStage}
 import net.minecraft.block.BlockLiquid
@@ -11,6 +9,8 @@ import net.minecraft.world.World
 import net.minecraft.world.chunk.IChunkProvider
 import net.minecraft.world.gen.IChunkGenerator
 import net.minecraftforge.fml.common.IWorldGenerator
+
+import java.util.Random
 
 object SoulkeeperPlantGenerator extends IWorldGenerator {
   override def generate(random: Random, chunkX: Int, chunkZ: Int, world: World, chunkGenerator: IChunkGenerator, chunkProvider: IChunkProvider): Unit = {
