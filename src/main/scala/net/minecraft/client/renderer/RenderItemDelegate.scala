@@ -1,15 +1,15 @@
 package net.minecraft.client.renderer
 
-import java.util
-
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft.getMinecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.renderer.block.model.{BakedQuad, IBakedModel, ItemCameraTransforms}
+import net.minecraft.client.renderer.block.model.{BakedQuad, IBakedModel}
 import net.minecraft.client.resources.IResourceManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.world.World
+
+import java.util
 
 class RenderItemDelegate(base: RenderItem) extends RenderItem(getMinecraft.getTextureManager, getMinecraft.modelManager, getMinecraft.itemColors) {
 
@@ -31,8 +31,13 @@ class RenderItemDelegate(base: RenderItem) extends RenderItem(getMinecraft.getTe
   override def shouldRenderItemIn3D(stack: ItemStack): Boolean =
     base.shouldRenderItemIn3D(stack)
 
-  override def getItemModelWithOverrides(stack: ItemStack, worldIn: World, entitylivingbaseIn: EntityLivingBase): IBakedModel =
-    base.getItemModelWithOverrides(stack, worldIn, entitylivingbaseIn)
+  override def getItemModelWithOverrides(stack: ItemStack, worldIn: World, entitylivingbaseIn: EntityLivingBase): IBakedModel = {
+    val model = base.getItemModelWithOverrides(stack, worldIn, entitylivingbaseIn)
+    if (model == getItemModelMesher.getModelManager.getMissingModel)
+      super.getItemModelWithOverrides(stack, worldIn, entitylivingbaseIn)
+    else
+      model
+  }
 
   override def onResourceManagerReload(resourceManager: IResourceManager): Unit =
     base.onResourceManagerReload(resourceManager)
