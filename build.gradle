@@ -44,7 +44,9 @@ minecraft {
     accessTransformer = files(
             'src/main/resources/META-INF/soulkeeper_at.cfg',
             'deps_at/ccl_at.cfg',
-            'deps_at/jei_at.cfg'
+            'deps_at/jei_at.cfg',
+            'deps_at/inspirations_at.cfg',
+            'deps_at/mantle_at.cfg'
     )
 
     runs {
